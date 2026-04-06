@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Deployment and operations guide for the Euphoria Licensing web application.">
+  <title>Euphoria Licensing | Euphoria Docs</title>
+  <link rel="icon" type="image/x-icon" href="/public/images/euphoria.ico">
+  <link rel="stylesheet" href="/public/css/docs.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+</head>
+<body class="docs-page">
+  <header class="docs-topbar">
+    <div class="docs-topbar-inner">
+      <a class="docs-brand" href="/docs/"><img src="/public/images/euphoria.png" alt="Euphoria Development"><span>Euphoria Development Docs</span></a>
+      <nav class="docs-nav"><a href="/docs/">Home</a><a class="active" href="/docs/community/euphoria-licensing.html">Euphoria Licensing</a><a href="/index.html">Main Site</a></nav>
+    </div>
+  </header>
+
+  <main class="docs-shell">
+    <section class="docs-layout">
+      <aside class="docs-sidebar">
+        <h2>Community</h2>
+        <nav><a href="/docs/community/web-apps.html">Web Apps</a><a class="active" href="/docs/community/euphoria-licensing.html">Euphoria Licensing</a><a href="/docs/community/crafatar-api.html">Crafatar API</a><a href="/docs/community/crafatar-setup.html">Crafatar Setup</a><a href="/docs/community/blueprint-addons.html">Blueprint Addons</a><a href="/docs/community/refresh-theme.html">Refresh Theme</a><a href="/docs/community/endstone-plugins.html">Endstone Plugins</a></nav>
+      </aside>
+
+      <div class="docs-content panel-grid">
+        <article class="panel">
+          <h2><i class="fa-solid fa-key" aria-hidden="true"></i> Overview</h2>
+          <p><strong>Euphoria Licensing</strong> is a proprietary self-hosted web application for license operations, product validation workflows, and admin management.</p>
+          <div class="callout"><p>A valid commercial license is required to deploy this software. Redistribution, sublicensing, or source resale is not allowed.</p></div>
+          <div class="doc-actions"><a class="text-link" href="/docs/general-guides/licensing.html"><i class="fa-solid fa-book" aria-hidden="true"></i> Licensing Guide</a><a class="text-link" href="https://discord.gg/Cus2zP4pPH" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-discord" aria-hidden="true"></i> Support Discord</a></div>
+        </article>
+
+        <article class="panel">
+          <h2><i class="fa-solid fa-server" aria-hidden="true"></i> Minimum Requirements</h2>
+          <ul>
+            <li><strong>OS:</strong> Linux recommended (Windows Server/Desktop supported)</li>
+            <li><strong>Runtime:</strong> Node.js <code>22.x</code> + pnpm <code>10.22.0</code></li>
+            <li><strong>Database:</strong> PostgreSQL <code>14+</code> (15/16/17 recommended)</li>
+            <li><strong>Memory:</strong> 2 GB minimum, 4 GB recommended</li>
+            <li><strong>Production:</strong> Reverse proxy and TLS for public deployment</li>
+          </ul>
+        </article>
+
+        <article class="panel">
+          <h2><i class="fa-solid fa-bolt" aria-hidden="true"></i> Quick Install</h2>
+          <p>For first boot on a production-like host:</p>
+          <pre><code>cp .env.example .env
+pnpm install --frozen-lockfile
+pnpm db:migrate
+pnpm seed
+pnpm build
+pnpm start</code></pre>
+          <p>Open <code>http://SERVER_IP:3000</code> (or your domain) and rotate seeded admin credentials immediately.</p>
+        </article>
+
+        <article class="panel">
+          <h2><i class="fa-solid fa-sliders" aria-hidden="true"></i> Required Environment Values</h2>
+          <ul>
+            <li><code>APP_URL</code>: Public HTTPS URL used for auth callbacks and generated links.</li>
+            <li><code>BETTER_AUTH_SECRET</code>: Strong random auth secret.</li>
+            <li><code>APP_GUARD_TOKEN</code>: Distribution license guard token.</li>
+            <li><code>POSTGRES_URL</code> or <code>POSTGRES_*</code>: Database connection configuration.</li>
+            <li><code>HOST</code>/<code>PORT</code>: Runtime bind values (usually <code>0.0.0.0</code> and <code>3000</code> behind proxy).</li>
+          </ul>
+          <div class="callout"><p>Recommended hardening: set <code>APP_DATA_ENCRYPTION_KEY</code>, configure <code>TRUST_REVERSE_PROXY=true</code>, and restrict <code>CORS_ORIGINS</code> to known origins.</p></div>
+        </article>
+
+        <article class="panel">
+          <h2><i class="fa-solid fa-diagram-project" aria-hidden="true"></i> Production Flow</h2>
+          <ol>
+            <li>Provision PostgreSQL and create a dedicated database/user.</li>
+            <li>Install dependencies and configure <code>.env</code>.</li>
+            <li>Run <code>pnpm db:migrate</code> (or <code>pnpm db:push</code> for initial boot if required).</li>
+            <li>Seed initial admin with <code>pnpm seed</code> if needed.</li>
+            <li>Build and run via <code>pnpm build</code> and <code>pnpm start</code>.</li>
+            <li>Put the app behind Nginx/Caddy and enable HTTPS.</li>
+          </ol>
+          <p>Built runtime entrypoint: <code>.output/server/index.mjs</code></p>
+        </article>
+
+        <article class="panel">
+          <h2><i class="fa-solid fa-heart-pulse" aria-hidden="true"></i> Health Checks</h2>
+          <p>After go-live, verify these endpoints:</p>
+          <pre><code>curl -fsS https://licensing.example.com/api/system/health
+curl -fsS https://licensing.example.com/api/system/ready
+curl -fsS https://licensing.example.com/openapi.json</code></pre>
+          <p>Smoke test essentials: admin login, product listing, license validation endpoint, and logs view.</p>
+        </article>
+
+        <article class="panel">
+          <h2><i class="fa-solid fa-screwdriver-wrench" aria-hidden="true"></i> Troubleshooting</h2>
+          <ul>
+            <li><strong><code>APP_GUARD_TOKEN is missing</code>:</strong> Set the token in <code>.env</code> and restart.</li>
+            <li><strong>Database connection failed:</strong> Re-check <code>POSTGRES_URL</code>/<code>POSTGRES_*</code> and network/firewall access.</li>
+            <li><strong>Build failures:</strong> Confirm Node.js <code>22.x</code> and pnpm <code>10.22.0</code>, then reinstall deps.</li>
+            <li><strong>App unreachable:</strong> Check process health and proxy target (<code>127.0.0.1:3000</code> by default).</li>
+          </ul>
+        </article>
+
+        <article class="panel">
+          <div class="doc-actions"><a class="text-link" href="/docs/community/web-apps.html"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Web Apps</a><a class="text-link" href="/docs/community/crafatar-api.html">Crafatar API <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="docs-footer"><div class="docs-footer-inner"><span>&copy; Euphoria Development</span><nav><a href="/docs/">Docs Home</a><a href="/legal/terms-and-conditions.html">Site Terms</a><a href="/legal/privacy-policy.html">Privacy Policy</a></nav></div></footer>
+</body>
+</html>
