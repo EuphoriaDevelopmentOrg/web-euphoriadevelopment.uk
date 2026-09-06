@@ -1,4 +1,5 @@
 import { type CSSProperties, type ReactNode } from "react";
+import { Link } from "react-router-dom";
 
 type Section = { id: string; title: string; content: ReactNode | string[] };
 type Policy = {
@@ -25,19 +26,16 @@ export function LegalPolicyPage({ policy }: { policy: Policy }) {
     <>
       <header className="site-header">
         <div className="site-header-inner">
-          <a href="/" className="brand">
-            <img
-              src="/public/images/euphoria.png"
-              alt="Euphoria Development logo"
-            />
+          <Link to="/" className="brand">
+            <img src="/images/euphoria.png" alt="Euphoria Development logo" />
             <span>Euphoria Development</span>
-          </a>
+          </Link>
           <nav className="quick-links" aria-label="Legal navigation">
-            <a href="/">Home</a>
+            <Link to="/">Home</Link>
             {legalLinks.map(([href, label]) => (
-              <a
+              <Link
                 key={href}
-                href={href}
+                to={href}
                 className={
                   policy.title.startsWith(label.slice(0, -1)) ||
                   policy.title.startsWith(label)
@@ -52,7 +50,7 @@ export function LegalPolicyPage({ policy }: { policy: Policy }) {
                 }
               >
                 {label}
-              </a>
+              </Link>
             ))}
           </nav>
         </div>
@@ -118,9 +116,9 @@ export function LegalPolicyPage({ policy }: { policy: Policy }) {
           <span>© 2026 Euphoria Development</span>
           <nav aria-label="Legal">
             {legalLinks.map(([href, label]) => (
-              <a key={href} href={href}>
+              <Link key={href} to={href}>
                 {label} Policy
-              </a>
+              </Link>
             ))}
           </nav>
         </div>

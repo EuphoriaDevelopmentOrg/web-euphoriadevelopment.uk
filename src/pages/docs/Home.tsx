@@ -7,42 +7,42 @@ const categories = [
     [
       ["Licensing", "/docs/general-guides/licensing"],
       ["Licensed Resources", "/docs/general-guides/licensed-resources"],
-      ["Site and API", "/docs/general-guides/site-and-api.html"],
-      ["Installation", "/docs/general-guides/installation.html"],
-      ["Uninstalling", "/docs/general-guides/uninstalling.html"],
+      ["Site and API", "/docs/general-guides/site-and-api"],
+      ["Installation", "/docs/general-guides/installation"],
+      ["Uninstalling", "/docs/general-guides/uninstalling"],
     ],
   ],
   [
     "Theme & API",
     [
-      ["Theme Customiser", "/docs/euphoria-theme/theme-customiser.html"],
-      ["Game API Setup Guide", "/docs/game-api/setup-guide.html"],
+      ["Theme Customiser", "/docs/euphoria-theme/theme-customiser"],
+      ["Game API Setup Guide", "/docs/game-api/setup-guide"],
     ],
   ],
   [
     "Setup",
     [
-      ["Player Listing", "/docs/setup/player-listing.html"],
-      ["Refresh Theme", "/docs/setup/refresh-theme.html"],
-      ["MC Logs", "/docs/setup/mc-logs.html"],
-      ["Server Backgrounds", "/docs/setup/server-backgrounds.html"],
-      ["Translations", "/docs/setup/translations.html"],
-      ["Resource Alerts", "/docs/setup/resource-alerts.html"],
+      ["Player Listing", "/docs/setup/player-listing"],
+      ["Refresh Theme", "/docs/setup/refresh-theme"],
+      ["MC Logs", "/docs/setup/mc-logs"],
+      ["Server Backgrounds", "/docs/setup/server-backgrounds"],
+      ["Translations", "/docs/setup/translations"],
+      ["Resource Alerts", "/docs/setup/resource-alerts"],
     ],
   ],
   [
     "Community",
     [
-      ["Web Apps", "/docs/community/web-apps.html"],
-      ["StreamLink", "/docs/community/streamlink.html"],
-      ["Euphoria Licensing", "/docs/community/euphoria-licensing.html"],
-      ["Crafatar API", "/docs/community/crafatar-api.html"],
-      ["NitroCraft Setup", "/docs/community/nitrocraft-setup.html"],
+      ["Web Apps", "/docs/community/web-apps"],
+      ["StreamLink", "/docs/community/streamlink"],
+      ["Euphoria Licensing", "/docs/community/euphoria-licensing"],
+      ["Crafatar API", "/docs/community/crafatar-api"],
+      ["NitroCraft Setup", "/docs/community/nitrocraft-setup"],
     ],
   ],
 ] as const;
 
-export function DocsHome() {
+export function Home() {
   useEffect(() => {
     document.body.classList.add("docs-page");
     return () => document.body.classList.remove("docs-page");
@@ -123,7 +123,9 @@ export function DocsHome() {
                     <h3>{title}</h3>
                     <div className="quick-link-list">
                       {links.map(([label, href]) =>
-                        href === "/docs/general-guides/licensing" || href === "/docs/general-guides/licensed-resources" ? (
+                        href === "/docs/general-guides/licensing" ||
+                        href === "/docs/general-guides/licensed-resources" ||
+                        href === "/docs/general-guides/site-and-api" ? (
                           <Link key={href} className="text-link" to={href}>
                             {label}
                           </Link>

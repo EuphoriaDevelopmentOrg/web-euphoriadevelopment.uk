@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 
-export function DocsLicensing() {
+export function Licensing() {
   useEffect(() => {
     document.body.classList.add("docs-page");
     return () => document.body.classList.remove("docs-page");
@@ -31,10 +31,12 @@ export function DocsLicensing() {
               <Link className="active" to="/docs/general-guides/licensing">
                 Licensing
               </Link>
-              <Link to="/docs/general-guides/licensed-resources">Licensed Resources</Link>
-              <a href="/docs/general-guides/site-and-api.html">Site and API</a>
-              <a href="/docs/general-guides/installation.html">Installation</a>
-              <a href="/docs/general-guides/uninstalling.html">Uninstalling</a>
+              <Link to="/docs/general-guides/licensed-resources">
+                Licensed Resources
+              </Link>
+              <Link to="/docs/general-guides/site-and-api">Site and API</Link>
+              <Link to="/docs/general-guides/installation">Installation</Link>
+              <Link to="/docs/general-guides/uninstalling">Uninstalling</Link>
             </nav>
           </aside>
           <div className="docs-content panel-grid">
@@ -121,7 +123,12 @@ export function DocsLicensing() {
                 <Link className="text-link" to="/docs">
                   ← Docs Home
                 </Link>
-                <Link className="text-link" to="/docs/general-guides/licensed-resources">Licensed Resources →</Link>
+                <Link
+                  className="text-link"
+                  to="/docs/general-guides/licensed-resources"
+                >
+                  Licensed Resources →
+                </Link>
               </div>
             </article>
           </div>

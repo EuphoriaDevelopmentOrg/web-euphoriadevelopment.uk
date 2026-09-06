@@ -1,4 +1,5 @@
 import { LegalPolicyPage } from "../components/LegalPolicyPage";
+import { Link } from "react-router-dom";
 
 export function TermsAndConditions() {
   return (
@@ -59,7 +60,7 @@ export function TermsAndConditions() {
             content: (
               <p>
                 Refund eligibility is governed by our{" "}
-                <a href="/legal/refund-policy">Refund Policy</a> and any
+                <Link to="/legal/refund-policy">Refund Policy</Link> and any
                 non-waivable rights under applicable law.
               </p>
             ),

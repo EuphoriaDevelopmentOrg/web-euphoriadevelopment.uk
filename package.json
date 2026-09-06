@@ -28,7 +28,7 @@
     "@eslint/js": "^10.0.1",
     "@tailwindcss/postcss": "^4.1.10",
     "@kingironman2011/vite-pages": "^1.0.2",
-    "@vitejs/plugin-react": "^5.1.1",
+    "@vitejs/plugin-react": "^6.1.1",
     "eslint": "^10.10.0",
     "globals": "^17.12.0",
     "postcss": "^8.5.6",
