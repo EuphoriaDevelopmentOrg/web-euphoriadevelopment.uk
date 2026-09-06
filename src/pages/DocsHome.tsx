@@ -1,11 +1,12 @@
-import "../../public/css/docs.css";
+import { useEffect } from "react";
+import { Link } from "react-router-dom";
 
 const categories = [
   [
     "General Guides",
     [
-      ["Licensing", "/docs/general-guides/licensing.html"],
-      ["Licensed Resources", "/docs/general-guides/licensed-resources.html"],
+      ["Licensing", "/docs/general-guides/licensing"],
+      ["Licensed Resources", "/docs/general-guides/licensed-resources"],
       ["Site and API", "/docs/general-guides/site-and-api.html"],
       ["Installation", "/docs/general-guides/installation.html"],
       ["Uninstalling", "/docs/general-guides/uninstalling.html"],
@@ -42,19 +43,24 @@ const categories = [
 ] as const;
 
 export function DocsHome() {
+  useEffect(() => {
+    document.body.classList.add("docs-page");
+    return () => document.body.classList.remove("docs-page");
+  }, []);
+
   return (
-    <div className="docs-page">
+    <div>
       <header className="docs-topbar">
         <div className="docs-topbar-inner">
-          <a className="docs-brand" href="/docs">
+          <Link className="docs-brand" to="/docs">
             <img src="/images/euphoria.png" alt="Euphoria Development" />
             <span>Euphoria Development Docs</span>
-          </a>
+          </Link>
           <nav className="docs-nav" aria-label="Documentation top navigation">
-            <a className="active" href="/docs">
+            <Link className="active" to="/docs">
               Home
-            </a>
-            <a href="/">Main Site</a>
+            </Link>
+            <Link to="/">Main Site</Link>
             <a
               href="https://euphoria-development.gitbook.io/euphoria-development"
               target="_blank"
@@ -81,15 +87,12 @@ export function DocsHome() {
             terms.
           </p>
           <div className="docs-hero-actions">
-            <a
-              className="docs-button"
-              href="/docs/general-guides/licensing.html"
-            >
+            <Link className="docs-button" to="/docs/general-guides/licensing">
               Start with Licensing
-            </a>
-            <a className="docs-button ghost" href="/">
+            </Link>
+            <Link className="docs-button ghost" to="/">
               Back to Main Website
-            </a>
+            </Link>
           </div>
         </section>
         <section className="docs-layout">
@@ -119,11 +122,17 @@ export function DocsHome() {
                   >
                     <h3>{title}</h3>
                     <div className="quick-link-list">
-                      {links.map(([label, href]) => (
-                        <a key={href} className="text-link" href={href}>
-                          {label}
-                        </a>
-                      ))}
+                      {links.map(([label, href]) =>
+                        href === "/docs/general-guides/licensing" || href === "/docs/general-guides/licensed-resources" ? (
+                          <Link key={href} className="text-link" to={href}>
+                            {label}
+                          </Link>
+                        ) : (
+                          <a key={href} className="text-link" href={href}>
+                            {label}
+                          </a>
+                        ),
+                      )}
                     </div>
                   </section>
                 ))}

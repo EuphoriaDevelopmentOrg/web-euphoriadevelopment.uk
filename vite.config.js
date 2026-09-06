@@ -1,10 +1,26 @@
-import { cpSync, readdirSync } from "node:fs";
-import { resolve } from "node:path";
+import { cpSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { join, resolve } from "node:path";
 import react from "@vitejs/plugin-react";
 import { vitePages } from "@kingironman2011/vite-pages";
 import { defineConfig } from "vite";
 
 const projectRoot = resolve(import.meta.dirname);
+
+function updateLegacyDocsStyles(directory) {
+  for (const entry of readdirSync(directory, { withFileTypes: true })) {
+    const file = join(directory, entry.name);
+    if (entry.isDirectory()) updateLegacyDocsStyles(file);
+    if (entry.isFile() && entry.name.endsWith(".html")) {
+      writeFileSync(
+        file,
+        readFileSync(file, "utf8").replaceAll(
+          "/public/css/docs.css",
+          "/styles.css",
+        ),
+      );
+    }
+  }
+}
 
 export default defineConfig({
   plugins: [
@@ -26,9 +42,20 @@ export default defineConfig({
               resolve(dir, "docs", entry.name),
               { recursive: true },
             );
+            updateLegacyDocsStyles(resolve(dir, "docs", entry.name));
           }
         }
       },
     },
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        assetFileNames: (asset) =>
+          asset.name?.endsWith(".css")
+            ? "styles.css"
+            : "assets/[name]-[hash][extname]",
+      },
+    },
+  },
 });

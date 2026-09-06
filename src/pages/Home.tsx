@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { initContributors } from "../utils/contributors";
 import { initDonators } from "../utils/donators";
 import { initEndstonePlugins } from "../utils/endstone-plugins";
 import { initProducts } from "../utils/products";
 import { initStats } from "../utils/stats";
 import { initWebApps } from "../utils/web-apps";
-import "./home.css";
 
 const navigation = [
   ["#statistics", "Statistics"],
@@ -79,9 +79,9 @@ export function Home() {
               {label}
             </a>
           ))}
-          <a href="/docs/" className="text-sm font-medium hover:text-blue-300">
+          <Link to="/docs" className="text-sm font-medium hover:text-blue-300">
             Docs
-          </a>
+          </Link>
         </div>
         <button
           type="button"
@@ -98,7 +98,9 @@ export function Home() {
                 {label}
               </a>
             ))}
-            <a href="/docs/">Docs</a>
+            <Link to="/docs" onClick={() => setMenuOpen(false)}>
+              Docs
+            </Link>
           </div>
         )}
       </nav>
@@ -145,9 +147,9 @@ export function Home() {
         <footer className="glass mt-4 border-t border-neutral-800 px-4 py-8 text-center text-neutral-400">
           <p>© 2026 Euphoria Development. All rights reserved.</p>
           <div className="mt-3 flex justify-center gap-3 text-sm">
-            <a href="/legal/privacy-policy">Privacy Policy</a>
-            <a href="/legal/refund-policy">Refund Policy</a>
-            <a href="/legal/terms-and-conditions">Terms &amp; Conditions</a>
+            <Link to="/legal/privacy-policy">Privacy Policy</Link>
+            <Link to="/legal/refund-policy">Refund Policy</Link>
+            <Link to="/legal/terms-and-conditions">Terms &amp; Conditions</Link>
           </div>
         </footer>
       </main>
