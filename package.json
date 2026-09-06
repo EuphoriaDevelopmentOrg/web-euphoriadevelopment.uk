@@ -2,10 +2,12 @@
   "private": true,
   "scripts": {
     "build:css": "tailwindcss -i ./public/css/input.css -o ./public/css/output.css --minify",
-    "watch:css": "tailwindcss -i ./public/css/input.css -o ./public/css/output.css --watch"
+    "watch:css": "tailwindcss -i ./public/css/input.css -o ./public/css/output.css --watch",
+    "start": "serve -s . -l 3000"
   },
   "dependencies": {
     "@tailwindcss/cli": "^4.1.10",
-    "tailwindcss": "^4.1.10"
+    "tailwindcss": "^4.1.10",
+    "serve": "^14.2.4"
   }
 }
