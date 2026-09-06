@@ -1,3 +1,4 @@
+import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -18,15 +19,14 @@ export function CommunityRefreshTheme() {
 
   useEffect(() => {
     document.body.classList.add("docs-page");
-    void fetch("https://api.github.com/repos/EuphoriaTheme/Refresh-Theme", {
-      headers: { Accept: "application/vnd.github+json" },
-    })
-      .then((response) =>
-        response.ok
-          ? (response.json() as Promise<Repository>)
-          : Promise.reject(),
+    void axios
+      .get<Repository>(
+        "https://api.github.com/repos/EuphoriaTheme/Refresh-Theme",
+        {
+          headers: { Accept: "application/vnd.github+json" },
+        },
       )
-      .then(setRepository)
+      .then(({ data }) => setRepository(data))
       .catch(() => setRepository(null));
     return () => document.body.classList.remove("docs-page");
   }, []);

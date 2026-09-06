@@ -1,855 +1,154 @@
-// @ts-nocheck
-// Fetch and display Blueprint addons and themes from Euphoria Development API,
-// and attach GitHub repo links from the EuphoriaTheme org where possible.
-export function initProducts() {
-  const STATS_URL = "https://api.euphoriadevelopment.uk/stats/";
-  const CACHE_KEY = "blueprintProductsCache:v2";
-  const CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
+import axios from "axios";
 
-  const GITHUB_ORG = "EuphoriaTheme";
-  const GITHUB_CACHE_KEY = "blueprintGithubReposCache:v2";
-  const GITHUB_CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
+type Offer = { url?: unknown; price?: unknown; currency?: unknown };
+type RawProduct = {
+  id?: unknown;
+  name?: unknown;
+  identifier?: unknown;
+  summary?: unknown;
+  type?: unknown;
+  banner?: unknown;
+  platforms?: Record<string, Offer>;
+  stats?: { panels?: unknown };
+  versions?: { name?: unknown; created?: unknown }[];
+};
+type GithubRepository = {
+  name: string;
+  html_url: string;
+  stargazers_count: number;
+  forks_count: number;
+  archived: boolean;
+  fork: boolean;
+};
 
-  const PLATFORM_PRIORITY = ["BUILTBYBIT", "SOURCEXCHANGE"];
+export type BlueprintProduct = {
+  id: string;
+  name: string;
+  summary: string;
+  type: "addon" | "theme";
+  banner: string | null;
+  blueprintUrl: string | null;
+  builtByBitUrl: string | null;
+  sourceXchangeUrl: string | null;
+  githubUrl: string | null;
+  githubStars: number | null;
+  githubForks: number | null;
+  panels: number;
+  priceLabel: string;
+  latestVersion: string | null;
+  latestUpdated: string | null;
+};
 
-  function normalizeType(type) {
-    return String(type || "")
-      .trim()
-      .toLowerCase();
+function safeUrl(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" || url.protocol === "http:"
+      ? url.href
+      : null;
+  } catch {
+    return null;
   }
-
-  function safeUrl(url) {
-    if (!url) return null;
-    try {
-      const u = new URL(String(url), window.location.href);
-      if (u.protocol !== "http:" && u.protocol !== "https:") return null;
-      return u.href;
-    } catch {
-      return null;
-    }
+}
+function bannerUrl(value: unknown): string | null {
+  if (typeof value === "string") return safeUrl(value);
+  if (!value || typeof value !== "object") return null;
+  const banner = value as { lowres?: unknown; fullres?: unknown };
+  return safeUrl(banner.lowres) ?? safeUrl(banner.fullres);
+}
+function key(value: unknown): string {
+  return String(value ?? "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+function price(platforms: Record<string, Offer> | undefined): string {
+  const offers = Object.values(platforms ?? {})
+    .map((offer) => ({
+      price: Number(offer.price),
+      currency: typeof offer.currency === "string" ? offer.currency : null,
+    }))
+    .filter((offer) => Number.isFinite(offer.price) && offer.price > 0);
+  if (!offers.length) return "FREE";
+  const offer = offers[0];
+  try {
+    return offer.currency
+      ? new Intl.NumberFormat(undefined, {
+          style: "currency",
+          currency: offer.currency,
+        }).format(offer.price)
+      : offer.price.toFixed(2);
+  } catch {
+    return offer.price.toFixed(2);
   }
-
-  function escapeHtml(input) {
-    return String(input || "")
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/\"/g, "&quot;")
-      .replace(/'/g, "&#39;");
-  }
-
-  function escapeAttr(input) {
-    // Keep it simple; we only use this for attributes like src/href/alt.
-    return escapeHtml(input);
-  }
-
-  function normalizeRepoKey(value) {
-    return String(value || "")
-      .trim()
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/-+/g, "-")
-      .replace(/^-|-$/g, "");
-  }
-
-  function extractRepoKeyFromGithubUrl(url) {
-    const href = safeUrl(url);
-    if (!href) return null;
-
-    try {
-      const u = new URL(href);
-      if (u.hostname !== "github.com") return null;
-
-      const parts = u.pathname.split("/").filter(Boolean);
-      const owner = parts[0] || "";
-      const repo = parts[1] || "";
-
-      if (!owner || !repo) return null;
-      if (String(owner).toLowerCase() !== String(GITHUB_ORG).toLowerCase())
-        return null;
-
-      return normalizeRepoKey(repo);
-    } catch {
-      return null;
-    }
-  }
-
-  function getGridColumnCount(grid) {
-    if (!grid) return 1;
-    const computed = window.getComputedStyle(grid);
-    const template =
-      computed && computed.gridTemplateColumns
-        ? String(computed.gridTemplateColumns)
-        : "";
-    if (!template || template === "none") return 1;
-
-    // Some browsers may still return repeat(...) here; handle it defensively.
-    const repeatMatch = template.match(/repeat\((\d+),/);
-    if (repeatMatch) {
-      const n = Number.parseInt(repeatMatch[1], 10);
-      return Number.isFinite(n) && n > 0 ? n : 1;
-    }
-
-    const cols = template.split(" ").filter(Boolean).length;
-    return Math.max(1, cols);
-  }
-
-  function ensureMoreToggle(grid, options = {}) {
-    if (!grid || !grid.id) return;
-
-    const rows = Number.isFinite(Number(options.rows))
-      ? Number(options.rows)
-      : 1;
-    const moreLabel = options.moreLabel ? String(options.moreLabel) : "More";
-    const lessLabel = options.lessLabel
-      ? String(options.lessLabel)
-      : "Show less";
-
-    const items = Array.from(grid.children).filter(
-      (el) => el && el.nodeType === 1,
-    );
-    const columns = getGridColumnCount(grid);
-    const visibleCount = Math.max(1, columns * Math.max(1, rows));
-    const needsToggle = items.length > visibleCount;
-
-    const wrapperId = `${grid.id}-more-toggle`;
-    let wrapper = document.getElementById(wrapperId);
-
-    // If the grid doesn't need toggling, ensure everything is visible and hide/remove any existing toggle.
-    if (!needsToggle) {
-      items.forEach((el) => el.classList.remove("hidden"));
-      if (wrapper) wrapper.classList.add("hidden");
-      return;
-    }
-
-    if (!wrapper) {
-      wrapper = document.createElement("div");
-      wrapper.id = wrapperId;
-      wrapper.className = "mt-4 flex justify-center";
-      wrapper.innerHTML = `
-        <button
-          type="button"
-          class="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-100 text-sm font-semibold transition-colors border border-neutral-700"
-          aria-controls="${grid.id}"
-        >${moreLabel}</button>
-      `;
-      grid.insertAdjacentElement("afterend", wrapper);
-    }
-
-    const button = wrapper.querySelector("button");
-    if (!button) return;
-
-    const update = () => {
-      const freshItems = Array.from(grid.children).filter(
-        (el) => el && el.nodeType === 1,
-      );
-      const colsNow = getGridColumnCount(grid);
-      const visibleNow = Math.max(1, colsNow * Math.max(1, rows));
-      const expanded = grid.dataset.moreExpanded === "1";
-
-      if (freshItems.length <= visibleNow) {
-        freshItems.forEach((el) => el.classList.remove("hidden"));
-        wrapper.classList.add("hidden");
-        return;
-      }
-
-      wrapper.classList.remove("hidden");
-
-      if (expanded) {
-        freshItems.forEach((el) => el.classList.remove("hidden"));
-        button.textContent = lessLabel;
-        button.setAttribute("aria-expanded", "true");
-        return;
-      }
-
-      freshItems.forEach((el, idx) => {
-        if (idx < visibleNow) el.classList.remove("hidden");
-        else el.classList.add("hidden");
-      });
-      button.textContent = moreLabel;
-      button.setAttribute("aria-expanded", "false");
-    };
-
-    if (!("moreExpanded" in grid.dataset)) grid.dataset.moreExpanded = "0"; // default collapsed
-
-    if (!button.dataset.moreBound) {
-      button.dataset.moreBound = "1";
-      button.addEventListener("click", () => {
-        grid.dataset.moreExpanded =
-          grid.dataset.moreExpanded === "1" ? "0" : "1";
-        update();
-      });
-    }
-
-    if (!grid.dataset.moreResizeBound) {
-      grid.dataset.moreResizeBound = "1";
-      let raf = 0;
-      window.addEventListener("resize", () => {
-        // Only recompute the clamp while collapsed.
-        if (grid.dataset.moreExpanded === "1") return;
-        if (raf) cancelAnimationFrame(raf);
-        raf = requestAnimationFrame(update);
-      });
-    }
-
-    update();
-  }
-
-  function formatDate(isoString) {
-    try {
-      return new Intl.DateTimeFormat(undefined, {
+}
+function formatDate(value: unknown): string | null {
+  const date = new Date(typeof value === "string" ? value : "");
+  return Number.isNaN(date.getTime())
+    ? null
+    : new Intl.DateTimeFormat(undefined, {
         year: "numeric",
         month: "short",
         day: "2-digit",
-      }).format(new Date(isoString));
-    } catch {
-      return isoString || "";
-    }
-  }
+      }).format(date);
+}
 
-  function loadCache() {
-    try {
-      const raw = localStorage.getItem(CACHE_KEY);
-      if (!raw) return null;
-      const parsed = JSON.parse(raw);
-      if (!parsed || !parsed.ts || !Array.isArray(parsed.items)) return null;
-      if (Date.now() - parsed.ts > CACHE_TTL_MS) return null;
-      return parsed.items;
-    } catch {
-      return null;
-    }
-  }
-
-  function saveCache(items) {
-    try {
-      localStorage.setItem(
-        CACHE_KEY,
-        JSON.stringify({ ts: Date.now(), items }),
-      );
-    } catch {
-      // ignore storage failures (private mode, disabled storage, etc.)
-    }
-  }
-
-  function loadGithubCache() {
-    try {
-      const raw = localStorage.getItem(GITHUB_CACHE_KEY);
-      if (!raw) return null;
-      const parsed = JSON.parse(raw);
-      if (!parsed || !parsed.ts || !Array.isArray(parsed.items)) return null;
-      if (Date.now() - parsed.ts > GITHUB_CACHE_TTL_MS) return null;
-      return parsed.items;
-    } catch {
-      return null;
-    }
-  }
-
-  function saveGithubCache(items) {
-    try {
-      localStorage.setItem(
-        GITHUB_CACHE_KEY,
-        JSON.stringify({ ts: Date.now(), items }),
-      );
-    } catch {
-      // ignore storage failures (private mode, disabled storage, etc.)
-    }
-  }
-
-  function setCount(id, count) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.textContent = String(count);
-  }
-
-  function getBannerUrl(product) {
-    const banner = product && product.banner;
-    if (!banner) return null;
-    if (typeof banner === "string") return banner;
-    if (typeof banner === "object")
-      return banner.lowres || banner.fullres || null;
-    return null;
-  }
-
-  function getBlueprintUrl(product) {
-    const identifier = product && product.identifier;
-    if (!identifier) return null;
-    return `https://blueprint.zip/extensions/${encodeURIComponent(identifier)}`;
-  }
-
-  function getOffer(platforms, platformKey) {
-    if (!platforms || typeof platforms !== "object") return null;
-    const raw = platforms[platformKey];
-    if (!raw || typeof raw !== "object") return null;
-
-    const price = Number(raw.price);
-    const currency = raw.currency ? String(raw.currency).toUpperCase() : "";
-    const url = safeUrl(raw.url);
-
-    return {
-      platform: platformKey,
-      price: Number.isFinite(price) ? price : 0,
-      currency,
-      url,
-    };
-  }
-
-  function buildRepoIndex(repos) {
-    const list = Array.isArray(repos) ? repos : [];
-    const map = new Map();
-
-    list.forEach((repo) => {
-      if (!repo || repo.archived || repo.fork) return;
-      const key = normalizeRepoKey(repo.name);
-      if (!key) return;
-      if (!repo.html_url) return;
-      map.set(key, repo);
-    });
-
-    return map;
-  }
-
-  function repoCandidatesForProduct(product) {
-    const candidates = [];
-    const name = product && product.name ? String(product.name) : "";
-    const identifier =
-      product && product.identifier ? String(product.identifier) : "";
-    const type = normalizeType(product && product.type);
-
-    if (name) {
-      candidates.push(normalizeRepoKey(name));
-      if (type === "theme") {
-        candidates.push(normalizeRepoKey(`${name}-Theme`));
-        candidates.push(normalizeRepoKey(`${name} Theme`));
-      }
-    }
-
-    if (identifier) candidates.push(normalizeRepoKey(identifier));
-
-    return Array.from(new Set(candidates)).filter(Boolean);
-  }
-
-  function inferGithubRepo(product, repoIndex) {
-    if (!repoIndex || typeof repoIndex.get !== "function") return null;
-    const keys = repoCandidatesForProduct(product);
-    for (const key of keys) {
-      const repo = repoIndex.get(key);
-      if (repo && repo.html_url) return repo;
-    }
-    return null;
-  }
-
-  function attachGithubLinks(products, repos) {
-    const list = Array.isArray(products) ? products : [];
-    const repoIndex = buildRepoIndex(repos);
-
-    return list.map((p) => {
-      const explicit = safeUrl(
-        p && p.platforms && p.platforms.GITHUB && p.platforms.GITHUB.url,
-      );
-
-      let repo = null;
-      if (explicit) {
-        const keyFromUrl = extractRepoKeyFromGithubUrl(explicit);
-        if (keyFromUrl) repo = repoIndex.get(keyFromUrl) || null;
-      }
-      if (!repo) repo = inferGithubRepo(p, repoIndex);
-
-      const inferredUrl = (repo && repo.html_url) || null;
-      const githubUrl = explicit || inferredUrl || null;
-
-      const stars =
-        repo && typeof repo.stargazers_count === "number"
-          ? repo.stargazers_count
-          : null;
-      const forks =
-        repo && typeof repo.forks_count === "number" ? repo.forks_count : null;
-
+export async function fetchBlueprintProducts(): Promise<BlueprintProduct[]> {
+  const [{ data: stats }, { data: repositories }] = await Promise.all([
+    axios.get<{ blueprintExtensions?: RawProduct[] }>(
+      "https://api.euphoriadevelopment.uk/stats/",
+    ),
+    axios.get<GithubRepository[]>(
+      "https://api.github.com/orgs/EuphoriaTheme/repos?per_page=100&sort=updated",
+      { headers: { Accept: "application/vnd.github+json" } },
+    ),
+  ]);
+  const repoIndex = new Map(
+    repositories
+      .filter((repo) => !repo.archived && !repo.fork)
+      .map((repo) => [key(repo.name), repo]),
+  );
+  return (stats.blueprintExtensions ?? [])
+    .map((product, index) => {
+      const platforms = product.platforms ?? {};
+      const explicitGithub = safeUrl(platforms.GITHUB?.url);
+      const repository =
+        repoIndex.get(key(product.identifier)) ??
+        repoIndex.get(key(product.name));
+      const githubUrl = explicitGithub ?? repository?.html_url ?? null;
+      const latest = [...(product.versions ?? [])].sort(
+        (a, b) =>
+          Date.parse(String(b.created ?? "")) -
+          Date.parse(String(a.created ?? "")),
+      )[0];
       return {
-        ...(p || {}),
+        id: String(product.id ?? product.identifier ?? index),
+        name:
+          typeof product.name === "string" && product.name
+            ? product.name
+            : "Untitled",
+        summary:
+          typeof product.summary === "string"
+            ? product.summary
+            : "No summary provided.",
+        type: (String(product.type).toLowerCase() === "theme"
+          ? "theme"
+          : "addon") as "addon" | "theme",
+        banner: bannerUrl(product.banner),
+        blueprintUrl: safeUrl(platforms.BLUEPRINT?.url),
+        builtByBitUrl: safeUrl(platforms.BUILTBYBIT?.url),
+        sourceXchangeUrl: safeUrl(platforms.SOURCEXCHANGE?.url),
         githubUrl,
-        githubStars: stars,
-        githubForks: forks,
+        githubStars: repository?.stargazers_count ?? null,
+        githubForks: repository?.forks_count ?? null,
+        panels: Math.max(0, Number(product.stats?.panels) || 0),
+        priceLabel: price(platforms),
+        latestVersion:
+          typeof latest?.name === "string" ? `v${latest.name}` : null,
+        latestUpdated: formatDate(latest?.created),
       };
-    });
-  }
-
-  async function fetchGithubRepos() {
-    const url = `https://api.github.com/orgs/${encodeURIComponent(GITHUB_ORG)}/repos?per_page=100&sort=updated`;
-    const res = await fetch(url, {
-      headers: {
-        Accept: "application/vnd.github+json",
-      },
-    });
-
-    if (!res.ok) {
-      const remaining = res.headers.get("x-ratelimit-remaining");
-      if (res.status === 403 && remaining === "0") {
-        throw new Error("GitHub rate limit exceeded. Please try again later.");
-      }
-      throw new Error(`GitHub request failed (${res.status}).`);
-    }
-
-    const repos = await res.json();
-    const list = Array.isArray(repos) ? repos : [];
-
-    // Keep only the fields we need for matching and linking.
-    return list.map((repo) => ({
-      name: repo && repo.name,
-      html_url: repo && repo.html_url,
-      archived: Boolean(repo && repo.archived),
-      fork: Boolean(repo && repo.fork),
-      stargazers_count:
-        typeof (repo && repo.stargazers_count) === "number"
-          ? repo.stargazers_count
-          : 0,
-      forks_count:
-        typeof (repo && repo.forks_count) === "number" ? repo.forks_count : 0,
-    }));
-  }
-
-  function isFree(platforms) {
-    if (!platforms || typeof platforms !== "object") return true;
-
-    for (const key of Object.keys(platforms)) {
-      const offer = getOffer(platforms, key);
-      if (offer && offer.price > 0) return false;
-    }
-
-    return true;
-  }
-
-  function getAnyPaidOffer(platforms) {
-    if (!platforms || typeof platforms !== "object") return null;
-
-    // Prefer known platforms first, then anything else.
-    for (const key of PLATFORM_PRIORITY) {
-      const offer = getOffer(platforms, key);
-      if (offer && offer.price > 0) return offer;
-    }
-
-    for (const key of Object.keys(platforms)) {
-      const offer = getOffer(platforms, key);
-      if (offer && offer.price > 0) return offer;
-    }
-
-    return null;
-  }
-
-  function formatPriceLabel(product) {
-    const platforms = product && product.platforms;
-    if (isFree(platforms)) return { label: "FREE", sort: 0 };
-
-    const offer = getAnyPaidOffer(platforms);
-    if (!offer) return { label: "PAID", sort: 1 };
-
-    const amount = offer.price;
-    const currency = offer.currency;
-
-    if (currency) {
-      try {
-        return {
-          label: new Intl.NumberFormat(undefined, {
-            style: "currency",
-            currency,
-          }).format(amount),
-          sort: amount,
-        };
-      } catch {
-        // Fall back to a simple label if Intl rejects the currency code.
-      }
-    }
-
-    return {
-      label: amount.toLocaleString(undefined, {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }),
-      sort: amount,
-    };
-  }
-
-  function getLatestVersion(product) {
-    const versions = product && product.versions;
-    if (!Array.isArray(versions) || !versions.length) return null;
-
-    // API appears to be newest-first; still guard by picking max created date.
-    let best = null;
-    let bestTs = -Infinity;
-    for (const v of versions) {
-      const ts = Date.parse(v && v.created ? v.created : "");
-      if (!Number.isFinite(ts)) continue;
-      if (ts > bestTs) {
-        bestTs = ts;
-        best = v;
-      }
-    }
-
-    return best || versions[0];
-  }
-
-  function sortProducts(items) {
-    return [...items].sort((a, b) => {
-      const aFree = isFree(a && a.platforms);
-      const bFree = isFree(b && b.platforms);
-      if (aFree !== bFree) return aFree ? 1 : -1; // paid first
-
-      const aPrice = formatPriceLabel(a).sort;
-      const bPrice = formatPriceLabel(b).sort;
-      if (bPrice !== aPrice) return bPrice - aPrice;
-
-      const aPanels = Number(a && a.stats && a.stats.panels) || 0;
-      const bPanels = Number(b && b.stats && b.stats.panels) || 0;
-      if (bPanels !== aPanels) return bPanels - aPanels;
-
-      return String(a && a.name ? a.name : "").localeCompare(
-        String(b && b.name ? b.name : ""),
-        undefined,
-        {
-          sensitivity: "base",
-        },
-      );
-    });
-  }
-
-  function createCard(product) {
-    const card = document.createElement("article");
-    card.className =
-      "glass rounded-lg p-4 sm:p-6 shadow border border-neutral-800 card-hover text-left";
-
-    const type = normalizeType(product && product.type);
-    const isTheme = type === "theme";
-    const typeLabel = isTheme ? "Theme" : "Addon";
-    const typeBadgeClass = isTheme
-      ? "bg-indigo-500/15 text-indigo-300 border border-indigo-500/20"
-      : "bg-amber-500/15 text-amber-300 border border-amber-500/20";
-
-    const name = String((product && product.name) || "Untitled");
-    const summary = String(
-      (product && product.summary) || "No summary provided.",
+    })
+    .sort(
+      (a, b) => a.type.localeCompare(b.type) || a.name.localeCompare(b.name),
     );
-
-    const bannerUrl =
-      safeUrl(getBannerUrl(product)) ||
-      `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=3b82f6&color=fff&size=600x320`;
-
-    const blueprintUrl = safeUrl(getBlueprintUrl(product));
-    const bbbUrl =
-      safeUrl(
-        product &&
-          product.platforms &&
-          product.platforms.BUILTBYBIT &&
-          product.platforms.BUILTBYBIT.url,
-      ) || null;
-    const sxUrl =
-      safeUrl(
-        product &&
-          product.platforms &&
-          product.platforms.SOURCEXCHANGE &&
-          product.platforms.SOURCEXCHANGE.url,
-      ) || null;
-    const ghUrl =
-      safeUrl(
-        product &&
-          (product.githubUrl ||
-            (product.platforms &&
-              product.platforms.GITHUB &&
-              product.platforms.GITHUB.url)),
-      ) || null;
-
-    const ghStarsRaw =
-      product && Object.prototype.hasOwnProperty.call(product, "githubStars")
-        ? product.githubStars
-        : null;
-    const ghForksRaw =
-      product && Object.prototype.hasOwnProperty.call(product, "githubForks")
-        ? product.githubForks
-        : null;
-    const ghStarsNum =
-      ghStarsRaw === null || ghStarsRaw === undefined
-        ? null
-        : Number(ghStarsRaw);
-    const ghForksNum =
-      ghForksRaw === null || ghForksRaw === undefined
-        ? null
-        : Number(ghForksRaw);
-    const ghStarsDisplay =
-      ghStarsNum !== null && Number.isFinite(ghStarsNum)
-        ? ghStarsNum.toLocaleString()
-        : null;
-    const ghForksDisplay =
-      ghForksNum !== null && Number.isFinite(ghForksNum)
-        ? ghForksNum.toLocaleString()
-        : null;
-
-    const panels =
-      Number(product && product.stats && product.stats.panels) || 0;
-    const panelsDisplay = panels.toLocaleString();
-
-    const priceInfo = formatPriceLabel(product);
-    const priceLabel = priceInfo.label;
-    const priceTextClass =
-      priceLabel === "FREE" ? "text-emerald-300" : "text-blue-300";
-
-    const latestVersion = getLatestVersion(product);
-    const latestLabel =
-      latestVersion && latestVersion.name ? `v${latestVersion.name}` : null;
-    const latestDate =
-      latestVersion && latestVersion.created
-        ? formatDate(latestVersion.created)
-        : null;
-
-    const buttons = [];
-    if (blueprintUrl) {
-      buttons.push({
-        label: "View on Blueprint",
-        href: blueprintUrl,
-        className:
-          "inline-flex items-center justify-center px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold transition-colors",
-      });
-    }
-    if (ghUrl) {
-      buttons.push({
-        label: "View on GitHub",
-        href: ghUrl,
-        className:
-          "inline-flex items-center justify-center px-3 py-2 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-100 text-sm font-semibold transition-colors border border-neutral-700",
-      });
-    }
-    if (bbbUrl) {
-      buttons.push({
-        label: "BuiltByBit",
-        href: bbbUrl,
-        className:
-          "inline-flex items-center justify-center px-3 py-2 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-100 text-sm font-semibold transition-colors border border-neutral-700",
-      });
-    }
-    if (sxUrl) {
-      buttons.push({
-        label: "SourceXchange",
-        href: sxUrl,
-        className:
-          "inline-flex items-center justify-center px-3 py-2 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-100 text-sm font-semibold transition-colors border border-neutral-700",
-      });
-    }
-
-    card.innerHTML = `
-      <div class="flex items-start justify-between gap-3">
-        <div class="min-w-0">
-          <h3 class="text-lg sm:text-xl font-semibold text-neutral-100 truncate">${escapeHtml(name)}</h3>
-          <p class="text-neutral-400 text-sm mt-1 line-clamp-2">${escapeHtml(summary)}</p>
-        </div>
-        <span class="shrink-0 text-xs px-2 py-1 rounded-full ${typeBadgeClass}">
-          ${typeLabel}
-        </span>
-      </div>
-
-      <div class="mt-4 overflow-hidden rounded-lg border border-neutral-800/70">
-        <img
-          src="${escapeAttr(bannerUrl)}"
-          alt="${escapeAttr(name)}"
-          class="w-full h-32 object-cover"
-          loading="lazy"
-          decoding="async"
-          onerror="this.onerror=null;this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(
-            name,
-          )}&background=3b82f6&color=fff&size=600x320'"
-        >
-      </div>
-
-      <div class="mt-4 flex flex-wrap items-center gap-2 text-xs text-neutral-400">
-        <span class="px-2 py-1 rounded bg-neutral-800/60 border border-neutral-700 ${priceTextClass}">${escapeHtml(
-          priceLabel,
-        )}</span>
-        <span class="px-2 py-1 rounded bg-neutral-800/60 border border-neutral-700">${escapeHtml(
-          panelsDisplay,
-        )} active panels</span>
-        ${
-          ghUrl && ghStarsDisplay !== null
-            ? `<span class="px-2 py-1 rounded bg-neutral-800/60 border border-neutral-700">${escapeHtml(
-                ghStarsDisplay,
-              )} stars</span>`
-            : ""
-        }
-        ${
-          ghUrl && ghForksDisplay !== null
-            ? `<span class="px-2 py-1 rounded bg-neutral-800/60 border border-neutral-700">${escapeHtml(
-                ghForksDisplay,
-              )} forks</span>`
-            : ""
-        }
-        ${
-          latestLabel
-            ? `<span class="px-2 py-1 rounded bg-neutral-800/60 border border-neutral-700">Latest ${escapeHtml(
-                latestLabel,
-              )}</span>`
-            : ""
-        }
-        ${
-          latestDate
-            ? `<span class="ml-auto text-neutral-500">Updated ${escapeHtml(latestDate)}</span>`
-            : ""
-        }
-      </div>
-
-      ${
-        buttons.length
-          ? `<div class="mt-4 flex flex-col sm:flex-row sm:flex-wrap gap-2">${buttons
-              .map((b) => {
-                return `<a href="${escapeAttr(b.href)}" target="_blank" rel="noopener noreferrer" class="${b.className}">${escapeHtml(
-                  b.label,
-                )}</a>`;
-              })
-              .join("")}</div>`
-          : ""
-      }
-    `;
-
-    return card;
-  }
-
-  function renderGrid(grid, items, emptyMessage) {
-    if (!grid) return;
-    grid.innerHTML = "";
-
-    if (!items.length) {
-      grid.innerHTML = `
-        <div class="col-span-full text-center text-neutral-400">
-          <p>${escapeHtml(emptyMessage)}</p>
-        </div>
-      `;
-      return;
-    }
-
-    items.forEach((product) => {
-      grid.appendChild(createCard(product));
-    });
-  }
-
-  function renderAll(products) {
-    const addonsGrid = document.getElementById("blueprint-addons-grid");
-    const themesGrid = document.getElementById("blueprint-themes-grid");
-
-    const list = Array.isArray(products) ? products : [];
-    const themes = sortProducts(
-      list.filter((p) => normalizeType(p && p.type) === "theme"),
-    );
-    const addons = sortProducts(
-      list.filter((p) => normalizeType(p && p.type) !== "theme"),
-    );
-
-    setCount("blueprint-addon-count", addons.length);
-    setCount("blueprint-theme-count", themes.length);
-
-    renderGrid(addonsGrid, addons, "No Blueprint addons found yet.");
-    renderGrid(themesGrid, themes, "No Blueprint themes found yet.");
-
-    ensureMoreToggle(addonsGrid);
-    ensureMoreToggle(themesGrid);
-
-    const note = document.getElementById("blueprint-products-note");
-    if (note) {
-      const total = addons.length + themes.length;
-      note.textContent = `Showing ${total.toLocaleString()} Blueprints | ${addons.length.toLocaleString()} addons | ${themes.length.toLocaleString()} themes`;
-    }
-  }
-
-  function renderError(message) {
-    const addonsGrid = document.getElementById("blueprint-addons-grid");
-    const themesGrid = document.getElementById("blueprint-themes-grid");
-
-    const html = `
-      <div class="col-span-full text-center text-neutral-400">
-        <p>${escapeHtml(message)}</p>
-      </div>
-    `;
-
-    if (addonsGrid) addonsGrid.innerHTML = html;
-    if (themesGrid) themesGrid.innerHTML = html;
-
-    setCount("blueprint-addon-count", 0);
-    setCount("blueprint-theme-count", 0);
-
-    const note = document.getElementById("blueprint-products-note");
-    if (note) note.textContent = "";
-  }
-
-  async function fetchProducts() {
-    const res = await fetch(STATS_URL, {
-      headers: { Accept: "application/json" },
-    });
-    if (!res.ok) throw new Error(`Request failed (${res.status}).`);
-
-    const data = await res.json();
-    const items = Array.isArray(data && data.blueprintExtensions)
-      ? data.blueprintExtensions
-      : [];
-
-    // Keep only the fields we render/cache.
-    return items.map((p) => ({
-      id: p.id,
-      name: p.name,
-      identifier: p.identifier,
-      summary: p.summary,
-      type: p.type,
-      banner: p.banner,
-      platforms: p.platforms,
-      stats: p.stats,
-      versions: p.versions,
-      created: p.created,
-    }));
-  }
-
-  async function loadBlueprintProducts() {
-    const addonsGrid = document.getElementById("blueprint-addons-grid");
-    const themesGrid = document.getElementById("blueprint-themes-grid");
-    if (!addonsGrid && !themesGrid) return;
-
-    // Render cached content immediately (if available), then refresh in background.
-    const cached = loadCache();
-    const cachedRepos = loadGithubCache();
-    if (cached && cached.length)
-      renderAll(attachGithubLinks(cached, cachedRepos));
-
-    const [productsResult, reposResult] = await Promise.allSettled([
-      fetchProducts(),
-      fetchGithubRepos(),
-    ]);
-
-    const freshRepos =
-      reposResult.status === "fulfilled" ? reposResult.value : null;
-    const reposForLinks =
-      (freshRepos && freshRepos.length ? freshRepos : cachedRepos) || null;
-    if (freshRepos && freshRepos.length) saveGithubCache(freshRepos);
-
-    if (productsResult.status === "fulfilled") {
-      const items = productsResult.value;
-      if (!items.length) {
-        // If cache rendered, avoid replacing it with an error.
-        if (cached && cached.length) return;
-        renderError("No Blueprint products found yet.");
-        return;
-      }
-
-      saveCache(items);
-      renderAll(attachGithubLinks(items, reposForLinks));
-      return;
-    }
-
-    // Products fetch failed.
-    // If cache rendered, keep it, but if GitHub repos loaded successfully re-render cache to attach links.
-    if (cached && cached.length) {
-      if (freshRepos && freshRepos.length)
-        renderAll(attachGithubLinks(cached, reposForLinks));
-      return;
-    }
-
-    const err = productsResult.reason;
-    renderError(
-      err instanceof Error
-        ? err.message
-        : "Unable to load products at this time.",
-    );
-  }
-
-  void loadBlueprintProducts();
 }

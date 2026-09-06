@@ -1,3 +1,4 @@
+import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -21,18 +22,13 @@ export function WebApps() {
     document.body.classList.add("docs-page");
     void Promise.all(
       Object.entries(repositories).map(async ([key, repository]) => {
-        const response = await fetch(
-          `https://api.github.com/repos/${repository}`,
-          {
-            headers: { Accept: "application/vnd.github+json" },
-          },
-        );
-        if (!response.ok) throw new Error("GitHub request failed");
-        const repo = (await response.json()) as {
+        const { data: repo } = await axios.get<{
           forks_count?: number;
           stargazers_count?: number;
           language?: string | null;
-        };
+        }>(`https://api.github.com/repos/${repository}`, {
+          headers: { Accept: "application/vnd.github+json" },
+        });
         return [
           key,
           {

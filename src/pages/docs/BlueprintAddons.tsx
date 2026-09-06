@@ -1,3 +1,4 @@
+import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -31,11 +32,11 @@ export function BlueprintAddons() {
     document.body.classList.add("docs-page");
     void Promise.all(
       addonNames.map(async (name) => {
-        const response = await fetch(
+        const { data } = await axios.get<Repository>(
           `https://api.github.com/repos/EuphoriaTheme/${name}`,
           { headers: { Accept: "application/vnd.github+json" } },
         );
-        return response.ok ? ((await response.json()) as Repository) : null;
+        return data;
       }),
     )
       .then((results) =>

@@ -1,3 +1,4 @@
+import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -18,16 +19,12 @@ export function EndstonePlugins() {
 
   useEffect(() => {
     document.body.classList.add("docs-page");
-    void fetch(
-      "https://api.github.com/orgs/EuphoriaDevelopmentOrg/repos?per_page=100&sort=updated",
-      { headers: { Accept: "application/vnd.github+json" } },
-    )
-      .then((response) =>
-        response.ok
-          ? (response.json() as Promise<Repository[]>)
-          : Promise.reject(),
+    void axios
+      .get<Repository[]>(
+        "https://api.github.com/orgs/EuphoriaDevelopmentOrg/repos?per_page=100&sort=updated",
+        { headers: { Accept: "application/vnd.github+json" } },
       )
-      .then((results) =>
+      .then(({ data: results }) =>
         setRepositories(
           results
             .filter(
