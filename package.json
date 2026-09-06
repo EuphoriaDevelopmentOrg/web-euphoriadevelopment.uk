@@ -1,13 +1,14 @@
 {
   "private": true,
+  "type": "module",
   "engines": {
     "node": "^24",
     "pnpm": "11.24.0"
   },
   "packageManager": "pnpm@11.24.0",
   "scripts": {
-    "build": "tailwindcss -i ./public/css/input.css -o ./public/css/output.css --minify",
-    "start": "node server.js",
+    "dev": "vite",
+    "build": "tailwindcss -i ./public/css/input.css -o ./public/css/output.css --minify && vite build",
     "watch": "tailwindcss -i ./public/css/input.css -o ./public/css/output.css --watch",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
@@ -18,6 +19,7 @@
   },
   "devDependencies": {
     "prettier": "^3.9.6",
-    "prettier-plugin-tailwindcss": "^0.8.1"
+    "prettier-plugin-tailwindcss": "^0.8.1",
+    "vite": "^8.2.2"
   }
 }
