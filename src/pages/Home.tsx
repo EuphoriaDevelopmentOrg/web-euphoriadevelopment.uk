@@ -295,31 +295,6 @@ function PersonCard({
     <article className={className}>{card}</article>
   );
 }
-function DynamicSection({
-  id,
-  title,
-  gridId,
-  className = "",
-}: {
-  id: string;
-  title: string;
-  gridId: string;
-  className?: string;
-}) {
-  return (
-    <section id={id} className={`px-4 py-12 ${className}`}>
-      <div className="mx-auto max-w-6xl text-center">
-        <h2 className="text-3xl font-bold">{title}</h2>
-        <div
-          id={gridId}
-          className="mt-8 grid grid-cols-1 gap-5 text-left sm:grid-cols-2 lg:grid-cols-3"
-        >
-          {skeleton}
-        </div>
-      </div>
-    </section>
-  );
-}
 function GetInvolved() {
   return (
     <section
