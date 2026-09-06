@@ -1,6 +1,7 @@
+// @ts-nocheck
 // Fetch and display Blueprint addons and themes from Euphoria Development API,
 // and attach GitHub repo links from the EuphoriaTheme org where possible.
-(() => {
+export function initProducts() {
   const STATS_URL = "https://api.euphoriadevelopment.uk/stats/";
   const CACHE_KEY = "blueprintProductsCache:v2";
   const CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
@@ -850,5 +851,5 @@
     );
   }
 
-  document.addEventListener("DOMContentLoaded", loadBlueprintProducts);
-})();
+  void loadBlueprintProducts();
+}

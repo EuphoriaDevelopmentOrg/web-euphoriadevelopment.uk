@@ -1,5 +1,6 @@
+// @ts-nocheck
 // Hydrate the Web Applications cards with GitHub repo metadata (stars, forks, language, last updated).
-(() => {
+export function initWebApps() {
   const CACHE_KEY = "webAppsGithubRepoMetaCache:v1";
   const CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
   const RELEASE_CACHE_KEY = "webAppsGithubReleaseDownloadsCache:v1";
@@ -634,9 +635,7 @@
     }
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
-    hydrateWebApps();
-    hydrateReleaseDownloads();
-    initWebAppsToggle();
-  });
-})();
+  void hydrateWebApps();
+  void hydrateReleaseDownloads();
+  initWebAppsToggle();
+}

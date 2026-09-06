@@ -1,5 +1,6 @@
+// @ts-nocheck
 // Fetch and display Endstone plugins from GitHub.
-(() => {
+export function initEndstonePlugins() {
   const ORG = "EuphoriaDevelopmentOrg";
   const CACHE_KEY = "endstonePluginsCache:v1";
   const CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
@@ -612,5 +613,5 @@
     }
   }
 
-  document.addEventListener("DOMContentLoaded", loadEndstonePlugins);
-})();
+  void loadEndstonePlugins();
+}

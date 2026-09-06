@@ -1,5 +1,6 @@
+// @ts-nocheck
 // Fetch and display real-time statistics from Euphoria Development API
-(() => {
+export function initStats() {
   const STATS_URL = "https://api.euphoriadevelopment.uk/stats/";
   const ENDSTONE_CACHE_KEY = "endstonePluginsCache:v1";
   const ENDSTONE_CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
@@ -143,6 +144,6 @@
     updateTotalProjects();
   });
 
-  // Load stats when page loads
-  document.addEventListener("DOMContentLoaded", loadStats);
-})();
+  // Load stats after the React page inserts its legacy markup.
+  void loadStats();
+}

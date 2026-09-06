@@ -1,6 +1,7 @@
-// Fetch and display donators from Euphoria Development API.
-(() => {
-  const API_URL = "https://api.euphoriadevelopment.uk/donators";
+// @ts-nocheck
+// Fetch and display contributors from Euphoria Development API.
+export function initContributors() {
+  const API_URL = "https://api.euphoriadevelopment.uk/contributors";
 
   function escapeHtml(input) {
     return String(input || "")
@@ -31,6 +32,7 @@
         : "";
     if (!template || template === "none") return 1;
 
+    // Some browsers may still return repeat(...) here; handle it defensively.
     const repeatMatch = template.match(/repeat\((\d+),/);
     if (repeatMatch) {
       const n = Number.parseInt(repeatMatch[1], 10);
@@ -62,6 +64,7 @@
     const wrapperId = `${grid.id}-more-toggle`;
     let wrapper = document.getElementById(wrapperId);
 
+    // If the grid doesn't need toggling, ensure everything is visible and hide/remove any existing toggle.
     if (!needsToggle) {
       items.forEach((el) => el.classList.remove("hidden"));
       if (wrapper) wrapper.classList.add("hidden");
@@ -116,7 +119,7 @@
       button.setAttribute("aria-expanded", "false");
     };
 
-    if (!("moreExpanded" in grid.dataset)) grid.dataset.moreExpanded = "0";
+    if (!("moreExpanded" in grid.dataset)) grid.dataset.moreExpanded = "0"; // default collapsed
 
     if (!button.dataset.moreBound) {
       button.dataset.moreBound = "1";
@@ -131,6 +134,7 @@
       grid.dataset.moreResizeBound = "1";
       let raf = 0;
       window.addEventListener("resize", () => {
+        // Only recompute the clamp while collapsed.
         if (grid.dataset.moreExpanded === "1") return;
         if (raf) cancelAnimationFrame(raf);
         raf = requestAnimationFrame(update);
@@ -140,13 +144,16 @@
     update();
   }
 
-  function createDonatorCard(donator) {
-    const name = donator && donator.Name ? String(donator.Name) : "Unknown";
-    const donation =
-      donator && donator.Donation ? String(donator.Donation) : "";
+  function createContributorCard(contributor) {
+    const name =
+      contributor && contributor.Name ? String(contributor.Name) : "Unknown";
+    const contribution =
+      contributor && contributor.Contribution
+        ? String(contributor.Contribution)
+        : "";
 
-    const href = safeUrl(donator && donator.Link);
-    const imageUrl = safeUrl(donator && donator.Image);
+    const href = safeUrl(contributor && contributor.Link);
+    const imageUrl = safeUrl(contributor && contributor.Image);
     const fallbackAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=3b82f6&color=fff&size=96`;
 
     const el = href
@@ -175,15 +182,16 @@
         <div class="min-w-0 flex-1">
           <div class="flex items-start justify-between gap-3">
             <h3 class="text-sm sm:text-base font-semibold text-neutral-100 truncate">${escapeHtml(name)}</h3>
-            ${
-              donation
-                ? `<span class="shrink-0 text-xs px-2 py-1 rounded-full bg-blue-500/15 text-blue-300 border border-blue-500/20">${escapeHtml(
-                    donation,
-                  )}</span>`
-                : `<span class="shrink-0 text-xs px-2 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/20">Supporter</span>`
-            }
+            <span class="shrink-0 text-xs px-2 py-1 rounded-full bg-blue-500/15 text-blue-300 border border-blue-500/20">
+              Contributor
+            </span>
           </div>
-          <p class="text-neutral-400 text-sm mt-1">Thank you for supporting Euphoria Development.</p>
+
+          ${
+            contribution
+              ? `<p class="text-neutral-400 text-sm mt-1 line-clamp-2">${escapeHtml(contribution)}</p>`
+              : `<p class="text-neutral-500 text-sm mt-1">Contributor</p>`
+          }
         </div>
       </div>
     `;
@@ -191,42 +199,42 @@
     return el;
   }
 
-  async function loadDonators() {
-    const grid = document.getElementById("donators-grid");
+  async function loadContributors() {
+    const grid = document.getElementById("contributors-grid");
     if (!grid) return;
 
     try {
       const response = await fetch(API_URL, {
         headers: { Accept: "application/json" },
       });
-      const donators = await response.json();
+      const contributors = await response.json();
 
       grid.innerHTML = "";
 
-      const items = Array.isArray(donators) ? donators : [];
+      const items = Array.isArray(contributors) ? contributors : [];
       if (!items.length) {
         grid.innerHTML = `
           <div class="col-span-full text-center text-neutral-400">
-            <p>No donators found yet.</p>
+            <p>No contributors found yet.</p>
           </div>
         `;
         return;
       }
 
-      items.forEach((donator) => {
-        grid.appendChild(createDonatorCard(donator));
+      items.forEach((contributor) => {
+        grid.appendChild(createContributorCard(contributor));
       });
 
       ensureMoreToggle(grid);
     } catch (error) {
-      console.error("Error fetching donators:", error);
+      console.error("Error fetching contributors:", error);
       grid.innerHTML = `
         <div class="col-span-full text-center text-neutral-400">
-          <p>Unable to load donators at this time.</p>
+          <p>Unable to load contributors at this time.</p>
         </div>
       `;
     }
   }
 
-  document.addEventListener("DOMContentLoaded", loadDonators);
-})();
+  void loadContributors();
+}
