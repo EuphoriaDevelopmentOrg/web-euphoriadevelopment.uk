@@ -26,10 +26,24 @@ body.legal-page {
   min-height: 100vh;
   color: var(--lp-text);
   background:
-    radial-gradient(1200px 680px at 88% -10%, rgba(var(--lp-accent-rgb), 0.28), transparent 62%),
-    radial-gradient(760px 520px at -8% 24%, rgba(56, 189, 248, 0.2), transparent 58%),
+    radial-gradient(
+      1200px 680px at 88% -10%,
+      rgba(var(--lp-accent-rgb), 0.28),
+      transparent 62%
+    ),
+    radial-gradient(
+      760px 520px at -8% 24%,
+      rgba(56, 189, 248, 0.2),
+      transparent 58%
+    ),
     linear-gradient(180deg, #020617 0%, #030816 38%, #05070f 100%);
-  font-family: 'IBM Plex Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-family:
+    "IBM Plex Sans",
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
   line-height: 1.55;
 }
 
@@ -111,7 +125,11 @@ a {
   border-radius: 999px;
   background: rgba(15, 23, 42, 0.58);
   padding: 0.42rem 0.72rem;
-  transition: transform 0.2s ease, color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease;
 }
 
 .quick-links a:hover {
@@ -139,8 +157,12 @@ a {
   border-radius: 24px;
   border: 1px solid var(--lp-border);
   padding: 1.3rem 1.35rem 1.2rem;
-  background:
-    linear-gradient(140deg, rgba(var(--lp-accent-rgb), 0.3), rgba(15, 23, 42, 0.62) 44%, rgba(15, 23, 42, 0.92));
+  background: linear-gradient(
+    140deg,
+    rgba(var(--lp-accent-rgb), 0.3),
+    rgba(15, 23, 42, 0.62) 44%,
+    rgba(15, 23, 42, 0.92)
+  );
   box-shadow: var(--lp-shadow);
 }
 
@@ -149,7 +171,11 @@ a {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: linear-gradient(120deg, rgba(255, 255, 255, 0.16), transparent 30%);
+  background: linear-gradient(
+    120deg,
+    rgba(255, 255, 255, 0.16),
+    transparent 30%
+  );
 }
 
 .hero-kicker {
@@ -164,7 +190,13 @@ a {
 .hero-title {
   margin: 0.32rem 0 0;
   color: var(--lp-title);
-  font-family: 'Space Grotesk', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-family:
+    "Space Grotesk",
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
   letter-spacing: -0.02em;
   font-size: clamp(1.95rem, 4.8vw, 3.1rem);
   line-height: 1.07;
@@ -213,7 +245,13 @@ a {
 .toc-panel h2 {
   margin: 0;
   color: var(--lp-title);
-  font-family: 'Space Grotesk', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-family:
+    "Space Grotesk",
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
   letter-spacing: -0.015em;
   font-size: 1.04rem;
 }
@@ -238,7 +276,10 @@ a {
   text-decoration: none;
   color: var(--lp-muted);
   font-size: 0.87rem;
-  transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease;
 }
 
 .toc-panel a:hover {
@@ -270,13 +311,23 @@ a {
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(90deg, rgba(var(--lp-accent-rgb), 0.9), rgba(var(--lp-accent-rgb), 0.05));
+  background: linear-gradient(
+    90deg,
+    rgba(var(--lp-accent-rgb), 0.9),
+    rgba(var(--lp-accent-rgb), 0.05)
+  );
 }
 
 .section-card h2 {
   margin: 0;
   color: var(--lp-title);
-  font-family: 'Space Grotesk', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-family:
+    "Space Grotesk",
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
   letter-spacing: -0.02em;
   font-size: clamp(1.06rem, 2.25vw, 1.44rem);
   line-height: 1.2;
@@ -316,14 +367,24 @@ a {
   margin-top: 0.2rem;
   border-radius: 18px;
   border: 1px solid rgba(var(--lp-accent-rgb), 0.36);
-  background: linear-gradient(135deg, rgba(var(--lp-accent-rgb), 0.23), rgba(15, 23, 42, 0.74));
+  background: linear-gradient(
+    135deg,
+    rgba(var(--lp-accent-rgb), 0.23),
+    rgba(15, 23, 42, 0.74)
+  );
   padding: 1rem 1.05rem;
 }
 
 .support-card h2 {
   margin: 0;
   color: var(--lp-title);
-  font-family: 'Space Grotesk', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-family:
+    "Space Grotesk",
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
   letter-spacing: -0.015em;
   font-size: 1.14rem;
 }

@@ -1,21 +1,21 @@
 // Fetch and display contributors from Euphoria Development API.
 (() => {
-  const API_URL = 'https://api.euphoriadevelopment.uk/contributors';
+  const API_URL = "https://api.euphoriadevelopment.uk/contributors";
 
   function escapeHtml(input) {
-    return String(input || '')
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/\"/g, '&quot;')
-      .replace(/'/g, '&#39;');
+    return String(input || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/\"/g, "&quot;")
+      .replace(/'/g, "&#39;");
   }
 
   function safeUrl(url) {
     if (!url) return null;
     try {
       const u = new URL(String(url), window.location.href);
-      if (u.protocol !== 'http:' && u.protocol !== 'https:') return null;
+      if (u.protocol !== "http:" && u.protocol !== "https:") return null;
       return u.href;
     } catch {
       return null;
@@ -25,8 +25,11 @@
   function getGridColumnCount(grid) {
     if (!grid) return 1;
     const computed = window.getComputedStyle(grid);
-    const template = computed && computed.gridTemplateColumns ? String(computed.gridTemplateColumns) : '';
-    if (!template || template === 'none') return 1;
+    const template =
+      computed && computed.gridTemplateColumns
+        ? String(computed.gridTemplateColumns)
+        : "";
+    if (!template || template === "none") return 1;
 
     // Some browsers may still return repeat(...) here; handle it defensively.
     const repeatMatch = template.match(/repeat\((\d+),/);
@@ -35,18 +38,24 @@
       return Number.isFinite(n) && n > 0 ? n : 1;
     }
 
-    const cols = template.split(' ').filter(Boolean).length;
+    const cols = template.split(" ").filter(Boolean).length;
     return Math.max(1, cols);
   }
 
   function ensureMoreToggle(grid, options = {}) {
     if (!grid || !grid.id) return;
 
-    const rows = Number.isFinite(Number(options.rows)) ? Number(options.rows) : 1;
-    const moreLabel = options.moreLabel ? String(options.moreLabel) : 'More';
-    const lessLabel = options.lessLabel ? String(options.lessLabel) : 'Show less';
+    const rows = Number.isFinite(Number(options.rows))
+      ? Number(options.rows)
+      : 1;
+    const moreLabel = options.moreLabel ? String(options.moreLabel) : "More";
+    const lessLabel = options.lessLabel
+      ? String(options.lessLabel)
+      : "Show less";
 
-    const items = Array.from(grid.children).filter((el) => el && el.nodeType === 1);
+    const items = Array.from(grid.children).filter(
+      (el) => el && el.nodeType === 1,
+    );
     const columns = getGridColumnCount(grid);
     const visibleCount = Math.max(1, columns * Math.max(1, rows));
     const needsToggle = items.length > visibleCount;
@@ -56,15 +65,15 @@
 
     // If the grid doesn't need toggling, ensure everything is visible and hide/remove any existing toggle.
     if (!needsToggle) {
-      items.forEach((el) => el.classList.remove('hidden'));
-      if (wrapper) wrapper.classList.add('hidden');
+      items.forEach((el) => el.classList.remove("hidden"));
+      if (wrapper) wrapper.classList.add("hidden");
       return;
     }
 
     if (!wrapper) {
-      wrapper = document.createElement('div');
+      wrapper = document.createElement("div");
       wrapper.id = wrapperId;
-      wrapper.className = 'mt-4 flex justify-center';
+      wrapper.className = "mt-4 flex justify-center";
       wrapper.innerHTML = `
         <button
           type="button"
@@ -72,57 +81,60 @@
           aria-controls="${grid.id}"
         >${moreLabel}</button>
       `;
-      grid.insertAdjacentElement('afterend', wrapper);
+      grid.insertAdjacentElement("afterend", wrapper);
     }
 
-    const button = wrapper.querySelector('button');
+    const button = wrapper.querySelector("button");
     if (!button) return;
 
     const update = () => {
-      const freshItems = Array.from(grid.children).filter((el) => el && el.nodeType === 1);
+      const freshItems = Array.from(grid.children).filter(
+        (el) => el && el.nodeType === 1,
+      );
       const colsNow = getGridColumnCount(grid);
       const visibleNow = Math.max(1, colsNow * Math.max(1, rows));
-      const expanded = grid.dataset.moreExpanded === '1';
+      const expanded = grid.dataset.moreExpanded === "1";
 
       if (freshItems.length <= visibleNow) {
-        freshItems.forEach((el) => el.classList.remove('hidden'));
-        wrapper.classList.add('hidden');
+        freshItems.forEach((el) => el.classList.remove("hidden"));
+        wrapper.classList.add("hidden");
         return;
       }
 
-      wrapper.classList.remove('hidden');
+      wrapper.classList.remove("hidden");
 
       if (expanded) {
-        freshItems.forEach((el) => el.classList.remove('hidden'));
+        freshItems.forEach((el) => el.classList.remove("hidden"));
         button.textContent = lessLabel;
-        button.setAttribute('aria-expanded', 'true');
+        button.setAttribute("aria-expanded", "true");
         return;
       }
 
       freshItems.forEach((el, idx) => {
-        if (idx < visibleNow) el.classList.remove('hidden');
-        else el.classList.add('hidden');
+        if (idx < visibleNow) el.classList.remove("hidden");
+        else el.classList.add("hidden");
       });
       button.textContent = moreLabel;
-      button.setAttribute('aria-expanded', 'false');
+      button.setAttribute("aria-expanded", "false");
     };
 
-    if (!('moreExpanded' in grid.dataset)) grid.dataset.moreExpanded = '0'; // default collapsed
+    if (!("moreExpanded" in grid.dataset)) grid.dataset.moreExpanded = "0"; // default collapsed
 
     if (!button.dataset.moreBound) {
-      button.dataset.moreBound = '1';
-      button.addEventListener('click', () => {
-        grid.dataset.moreExpanded = grid.dataset.moreExpanded === '1' ? '0' : '1';
+      button.dataset.moreBound = "1";
+      button.addEventListener("click", () => {
+        grid.dataset.moreExpanded =
+          grid.dataset.moreExpanded === "1" ? "0" : "1";
         update();
       });
     }
 
     if (!grid.dataset.moreResizeBound) {
-      grid.dataset.moreResizeBound = '1';
+      grid.dataset.moreResizeBound = "1";
       let raf = 0;
-      window.addEventListener('resize', () => {
+      window.addEventListener("resize", () => {
         // Only recompute the clamp while collapsed.
-        if (grid.dataset.moreExpanded === '1') return;
+        if (grid.dataset.moreExpanded === "1") return;
         if (raf) cancelAnimationFrame(raf);
         raf = requestAnimationFrame(update);
       });
@@ -132,22 +144,28 @@
   }
 
   function createContributorCard(contributor) {
-    const name = contributor && contributor.Name ? String(contributor.Name) : 'Unknown';
-    const contribution = contributor && contributor.Contribution ? String(contributor.Contribution) : '';
+    const name =
+      contributor && contributor.Name ? String(contributor.Name) : "Unknown";
+    const contribution =
+      contributor && contributor.Contribution
+        ? String(contributor.Contribution)
+        : "";
 
     const href = safeUrl(contributor && contributor.Link);
     const imageUrl = safeUrl(contributor && contributor.Image);
     const fallbackAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=3b82f6&color=fff&size=96`;
 
-    const el = href ? document.createElement('a') : document.createElement('article');
+    const el = href
+      ? document.createElement("a")
+      : document.createElement("article");
     if (href) {
       el.href = href;
-      el.target = '_blank';
-      el.rel = 'noopener noreferrer';
+      el.target = "_blank";
+      el.rel = "noopener noreferrer";
     }
 
     el.className =
-      'glass rounded-lg p-4 sm:p-6 shadow border border-neutral-800 card-hover text-left';
+      "glass rounded-lg p-4 sm:p-6 shadow border border-neutral-800 card-hover text-left";
 
     el.innerHTML = `
       <div class="flex items-start gap-3">
@@ -181,14 +199,16 @@
   }
 
   async function loadContributors() {
-    const grid = document.getElementById('contributors-grid');
+    const grid = document.getElementById("contributors-grid");
     if (!grid) return;
 
     try {
-      const response = await fetch(API_URL, { headers: { Accept: 'application/json' } });
+      const response = await fetch(API_URL, {
+        headers: { Accept: "application/json" },
+      });
       const contributors = await response.json();
 
-      grid.innerHTML = '';
+      grid.innerHTML = "";
 
       const items = Array.isArray(contributors) ? contributors : [];
       if (!items.length) {
@@ -206,7 +226,7 @@
 
       ensureMoreToggle(grid);
     } catch (error) {
-      console.error('Error fetching contributors:', error);
+      console.error("Error fetching contributors:", error);
       grid.innerHTML = `
         <div class="col-span-full text-center text-neutral-400">
           <p>Unable to load contributors at this time.</p>
@@ -215,5 +235,5 @@
     }
   }
 
-  document.addEventListener('DOMContentLoaded', loadContributors);
+  document.addEventListener("DOMContentLoaded", loadContributors);
 })();

@@ -25,11 +25,25 @@ body.docs-page {
   display: flex;
   flex-direction: column;
   color: var(--docs-text);
-  font-family: 'IBM Plex Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-family:
+    "IBM Plex Sans",
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
   line-height: 1.55;
   background:
-    radial-gradient(980px 520px at 86% -12%, rgba(var(--docs-accent-rgb), 0.26), transparent 64%),
-    radial-gradient(760px 460px at -8% 20%, rgba(14, 165, 233, 0.16), transparent 58%),
+    radial-gradient(
+      980px 520px at 86% -12%,
+      rgba(var(--docs-accent-rgb), 0.26),
+      transparent 64%
+    ),
+    radial-gradient(
+      760px 460px at -8% 20%,
+      rgba(14, 165, 233, 0.16),
+      transparent 58%
+    ),
     linear-gradient(180deg, #020617 0%, #030916 36%, var(--docs-bg) 100%);
 }
 
@@ -93,7 +107,11 @@ a {
   border: 1px solid var(--docs-border);
   background: rgba(15, 23, 42, 0.58);
   padding: 0.4rem 0.7rem;
-  transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .docs-nav a:hover {
@@ -120,8 +138,12 @@ a {
   border: 1px solid var(--docs-border);
   border-radius: 24px;
   padding: 1.3rem 1.35rem;
-  background:
-    linear-gradient(140deg, rgba(var(--docs-accent-rgb), 0.28), rgba(15, 23, 42, 0.65) 45%, rgba(8, 15, 30, 0.9));
+  background: linear-gradient(
+    140deg,
+    rgba(var(--docs-accent-rgb), 0.28),
+    rgba(15, 23, 42, 0.65) 45%,
+    rgba(8, 15, 30, 0.9)
+  );
   box-shadow: var(--docs-shadow);
 }
 
@@ -137,7 +159,13 @@ a {
 .docs-hero h1 {
   margin: 0.35rem 0 0;
   color: var(--docs-title);
-  font-family: 'Space Grotesk', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-family:
+    "Space Grotesk",
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
   letter-spacing: -0.02em;
   font-size: clamp(1.9rem, 5vw, 3rem);
   line-height: 1.08;
@@ -169,7 +197,10 @@ a {
   font-size: 0.86rem;
   text-decoration: none;
   padding: 0.55rem 0.82rem;
-  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .docs-button:hover {
@@ -207,7 +238,13 @@ a {
 .docs-sidebar h2 {
   margin: 0;
   color: var(--docs-title);
-  font-family: 'Space Grotesk', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-family:
+    "Space Grotesk",
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
   font-size: 1.05rem;
 }
 
@@ -231,7 +268,10 @@ a {
   color: var(--docs-muted);
   font-size: 0.89rem;
   padding: 0.45rem 0.58rem;
-  transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease;
 }
 
 .docs-sidebar a:hover {
@@ -262,7 +302,13 @@ a {
 .panel h2 {
   margin: 0;
   color: var(--docs-title);
-  font-family: 'Space Grotesk', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-family:
+    "Space Grotesk",
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
   font-size: clamp(1.05rem, 2.25vw, 1.4rem);
   letter-spacing: -0.018em;
 }
@@ -277,7 +323,13 @@ a {
 .panel h3 {
   margin: 0.78rem 0 0;
   color: var(--docs-title);
-  font-family: 'Space Grotesk', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-family:
+    "Space Grotesk",
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
   font-size: 0.98rem;
   letter-spacing: -0.01em;
 }
@@ -310,7 +362,9 @@ a {
   border-radius: 7px;
   padding: 0.06rem 0.4rem;
   font-size: 0.84em;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-family:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+    "Courier New", monospace;
 }
 
 .panel pre {
@@ -359,7 +413,13 @@ a {
   margin: 0;
   color: var(--docs-title);
   font-size: 1rem;
-  font-family: 'Space Grotesk', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-family:
+    "Space Grotesk",
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
 }
 
 .badge {

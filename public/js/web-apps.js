@@ -1,24 +1,27 @@
 // Hydrate the Web Applications cards with GitHub repo metadata (stars, forks, language, last updated).
 (() => {
-  const CACHE_KEY = 'webAppsGithubRepoMetaCache:v1';
+  const CACHE_KEY = "webAppsGithubRepoMetaCache:v1";
   const CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
-  const RELEASE_CACHE_KEY = 'webAppsGithubReleaseDownloadsCache:v1';
+  const RELEASE_CACHE_KEY = "webAppsGithubReleaseDownloadsCache:v1";
   const RELEASE_CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
 
   function escapeHtml(input) {
-    return String(input || '')
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/\"/g, '&quot;')
-      .replace(/'/g, '&#39;');
+    return String(input || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/\"/g, "&quot;")
+      .replace(/'/g, "&#39;");
   }
 
   function getGridColumnCount(grid) {
     if (!grid) return 1;
     const computed = window.getComputedStyle(grid);
-    const template = computed && computed.gridTemplateColumns ? String(computed.gridTemplateColumns) : '';
-    if (!template || template === 'none') return 1;
+    const template =
+      computed && computed.gridTemplateColumns
+        ? String(computed.gridTemplateColumns)
+        : "";
+    if (!template || template === "none") return 1;
 
     const repeatMatch = template.match(/repeat\((\d+),/);
     if (repeatMatch) {
@@ -26,18 +29,24 @@
       return Number.isFinite(n) && n > 0 ? n : 1;
     }
 
-    const cols = template.split(' ').filter(Boolean).length;
+    const cols = template.split(" ").filter(Boolean).length;
     return Math.max(1, cols);
   }
 
   function ensureMoreToggle(grid, options = {}) {
     if (!grid || !grid.id) return;
 
-    const rows = Number.isFinite(Number(options.rows)) ? Number(options.rows) : 1;
-    const moreLabel = options.moreLabel ? String(options.moreLabel) : 'More';
-    const lessLabel = options.lessLabel ? String(options.lessLabel) : 'Show less';
+    const rows = Number.isFinite(Number(options.rows))
+      ? Number(options.rows)
+      : 1;
+    const moreLabel = options.moreLabel ? String(options.moreLabel) : "More";
+    const lessLabel = options.lessLabel
+      ? String(options.lessLabel)
+      : "Show less";
 
-    const items = Array.from(grid.children).filter((el) => el && el.nodeType === 1);
+    const items = Array.from(grid.children).filter(
+      (el) => el && el.nodeType === 1,
+    );
     const columns = getGridColumnCount(grid);
     const visibleCount = Math.max(1, columns * Math.max(1, rows));
     const needsToggle = items.length > visibleCount;
@@ -46,15 +55,15 @@
     let wrapper = document.getElementById(wrapperId);
 
     if (!needsToggle) {
-      items.forEach((el) => el.classList.remove('hidden'));
-      if (wrapper) wrapper.classList.add('hidden');
+      items.forEach((el) => el.classList.remove("hidden"));
+      if (wrapper) wrapper.classList.add("hidden");
       return;
     }
 
     if (!wrapper) {
-      wrapper = document.createElement('div');
+      wrapper = document.createElement("div");
       wrapper.id = wrapperId;
-      wrapper.className = 'mt-4 flex justify-center';
+      wrapper.className = "mt-4 flex justify-center";
       wrapper.innerHTML = `
         <button
           type="button"
@@ -62,56 +71,59 @@
           aria-controls="${grid.id}"
         >${moreLabel}</button>
       `;
-      grid.insertAdjacentElement('afterend', wrapper);
+      grid.insertAdjacentElement("afterend", wrapper);
     }
 
-    const button = wrapper.querySelector('button');
+    const button = wrapper.querySelector("button");
     if (!button) return;
 
     const update = () => {
-      const freshItems = Array.from(grid.children).filter((el) => el && el.nodeType === 1);
+      const freshItems = Array.from(grid.children).filter(
+        (el) => el && el.nodeType === 1,
+      );
       const colsNow = getGridColumnCount(grid);
       const visibleNow = Math.max(1, colsNow * Math.max(1, rows));
-      const expanded = grid.dataset.moreExpanded === '1';
+      const expanded = grid.dataset.moreExpanded === "1";
 
       if (freshItems.length <= visibleNow) {
-        freshItems.forEach((el) => el.classList.remove('hidden'));
-        wrapper.classList.add('hidden');
+        freshItems.forEach((el) => el.classList.remove("hidden"));
+        wrapper.classList.add("hidden");
         return;
       }
 
-      wrapper.classList.remove('hidden');
+      wrapper.classList.remove("hidden");
 
       if (expanded) {
-        freshItems.forEach((el) => el.classList.remove('hidden'));
+        freshItems.forEach((el) => el.classList.remove("hidden"));
         button.textContent = lessLabel;
-        button.setAttribute('aria-expanded', 'true');
+        button.setAttribute("aria-expanded", "true");
         return;
       }
 
       freshItems.forEach((el, idx) => {
-        if (idx < visibleNow) el.classList.remove('hidden');
-        else el.classList.add('hidden');
+        if (idx < visibleNow) el.classList.remove("hidden");
+        else el.classList.add("hidden");
       });
       button.textContent = moreLabel;
-      button.setAttribute('aria-expanded', 'false');
+      button.setAttribute("aria-expanded", "false");
     };
 
-    if (!('moreExpanded' in grid.dataset)) grid.dataset.moreExpanded = '0';
+    if (!("moreExpanded" in grid.dataset)) grid.dataset.moreExpanded = "0";
 
     if (!button.dataset.moreBound) {
-      button.dataset.moreBound = '1';
-      button.addEventListener('click', () => {
-        grid.dataset.moreExpanded = grid.dataset.moreExpanded === '1' ? '0' : '1';
+      button.dataset.moreBound = "1";
+      button.addEventListener("click", () => {
+        grid.dataset.moreExpanded =
+          grid.dataset.moreExpanded === "1" ? "0" : "1";
         update();
       });
     }
 
     if (!grid.dataset.moreResizeBound) {
-      grid.dataset.moreResizeBound = '1';
+      grid.dataset.moreResizeBound = "1";
       let raf = 0;
-      window.addEventListener('resize', () => {
-        if (grid.dataset.moreExpanded === '1') return;
+      window.addEventListener("resize", () => {
+        if (grid.dataset.moreExpanded === "1") return;
         if (raf) cancelAnimationFrame(raf);
         raf = requestAnimationFrame(update);
       });
@@ -123,12 +135,12 @@
   function formatDate(isoString) {
     try {
       return new Intl.DateTimeFormat(undefined, {
-        year: 'numeric',
-        month: 'short',
-        day: '2-digit',
+        year: "numeric",
+        month: "short",
+        day: "2-digit",
       }).format(new Date(isoString));
     } catch {
-      return isoString || '';
+      return isoString || "";
     }
   }
 
@@ -137,7 +149,7 @@
       const raw = localStorage.getItem(CACHE_KEY);
       if (!raw) return {};
       const parsed = JSON.parse(raw);
-      if (!parsed || typeof parsed !== 'object') return {};
+      if (!parsed || typeof parsed !== "object") return {};
       return parsed;
     } catch {
       return {};
@@ -157,7 +169,7 @@
       const raw = localStorage.getItem(RELEASE_CACHE_KEY);
       if (!raw) return {};
       const parsed = JSON.parse(raw);
-      if (!parsed || typeof parsed !== 'object') return {};
+      if (!parsed || typeof parsed !== "object") return {};
       return parsed;
     } catch {
       return {};
@@ -180,7 +192,7 @@
 
   function getCached(repoPath) {
     const entry = cache && repoPath ? cache[repoPath] : null;
-    if (!entry || typeof entry !== 'object') return null;
+    if (!entry || typeof entry !== "object") return null;
     if (!entry.ts) return null;
     if (Date.now() - entry.ts > CACHE_TTL_MS) return null;
     return entry;
@@ -194,12 +206,12 @@
 
   function setMetaHidden(el, hidden) {
     if (!el) return;
-    el.classList.toggle('hidden', Boolean(hidden));
+    el.classList.toggle("hidden", Boolean(hidden));
   }
 
   function getCachedRelease(repoPath) {
     const entry = releaseCache && repoPath ? releaseCache[repoPath] : null;
-    if (!entry || typeof entry !== 'object') return null;
+    if (!entry || typeof entry !== "object") return null;
     if (!entry.ts) return null;
     if (Date.now() - entry.ts > RELEASE_CACHE_TTL_MS) return null;
     return entry;
@@ -212,8 +224,11 @@
   }
 
   function normalizeRepoPath(repoPath) {
-    const parts = String(repoPath || '').trim().split('/').filter(Boolean);
-    if (parts.length < 2) return '';
+    const parts = String(repoPath || "")
+      .trim()
+      .split("/")
+      .filter(Boolean);
+    if (parts.length < 2) return "";
     return `${parts[0]}/${parts[1]}`;
   }
 
@@ -222,18 +237,18 @@
     const jar = list.find(
       (a) =>
         a &&
-        typeof a.name === 'string' &&
+        typeof a.name === "string" &&
         a.browser_download_url &&
-        String(a.name).toLowerCase().endsWith('.jar'),
+        String(a.name).toLowerCase().endsWith(".jar"),
     );
     if (jar) return jar;
 
     const zip = list.find(
       (a) =>
         a &&
-        typeof a.name === 'string' &&
+        typeof a.name === "string" &&
         a.browser_download_url &&
-        String(a.name).toLowerCase().endsWith('.zip'),
+        String(a.name).toLowerCase().endsWith(".zip"),
     );
     if (zip) return zip;
 
@@ -242,141 +257,201 @@
 
   function setReleaseButtonDisabled(btn, label, title) {
     if (!btn) return;
-    btn.textContent = label || 'Download';
-    btn.removeAttribute('href');
-    btn.removeAttribute('target');
-    btn.removeAttribute('rel');
-    btn.setAttribute('aria-disabled', 'true');
-    btn.setAttribute('tabindex', '-1');
+    btn.textContent = label || "Download";
+    btn.removeAttribute("href");
+    btn.removeAttribute("target");
+    btn.removeAttribute("rel");
+    btn.setAttribute("aria-disabled", "true");
+    btn.setAttribute("tabindex", "-1");
     if (title) btn.title = title;
 
     btn.className =
-      'inline-flex items-center justify-center px-3 py-2 rounded-lg bg-neutral-800 text-neutral-400 text-sm font-semibold border border-neutral-700 opacity-70 cursor-not-allowed';
+      "inline-flex items-center justify-center px-3 py-2 rounded-lg bg-neutral-800 text-neutral-400 text-sm font-semibold border border-neutral-700 opacity-70 cursor-not-allowed";
   }
 
   function setReleaseButtonEnabled(btn, href, title) {
     if (!btn) return;
-    btn.textContent = 'Download';
+    btn.textContent = "Download";
     btn.href = href;
-    btn.target = '_blank';
-    btn.rel = 'noopener noreferrer';
-    btn.removeAttribute('tabindex');
-    btn.setAttribute('aria-disabled', 'false');
+    btn.target = "_blank";
+    btn.rel = "noopener noreferrer";
+    btn.removeAttribute("tabindex");
+    btn.setAttribute("aria-disabled", "false");
     if (title) btn.title = title;
 
     btn.className =
-      'inline-flex items-center justify-center px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold transition-colors';
+      "inline-flex items-center justify-center px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold transition-colors";
   }
 
   function applyReleaseDownloadState(repoPath, state) {
     if (!repoPath) return;
 
     const buttons = Array.from(
-      document.querySelectorAll('[data-github-release-download][data-github-release-repo]'),
-    ).filter((btn) => normalizeRepoPath(btn.getAttribute('data-github-release-repo')) === repoPath);
+      document.querySelectorAll(
+        "[data-github-release-download][data-github-release-repo]",
+      ),
+    ).filter(
+      (btn) =>
+        normalizeRepoPath(btn.getAttribute("data-github-release-repo")) ===
+        repoPath,
+    );
 
     buttons.forEach((btn) => {
-      if (!state || typeof state !== 'object') {
-        setReleaseButtonDisabled(btn, 'Download', 'Fetching latest GitHub release...');
+      if (!state || typeof state !== "object") {
+        setReleaseButtonDisabled(
+          btn,
+          "Download",
+          "Fetching latest GitHub release...",
+        );
         return;
       }
 
-      if (state.kind === 'asset' && state.url) {
-        const title = state.assetName ? `Download ${state.assetName}` : 'Download from GitHub Releases';
+      if (state.kind === "asset" && state.url) {
+        const title = state.assetName
+          ? `Download ${state.assetName}`
+          : "Download from GitHub Releases";
         setReleaseButtonEnabled(btn, state.url, title);
         return;
       }
 
-      if (state.kind === 'no_release') {
-        setReleaseButtonDisabled(btn, 'No Release', 'No GitHub releases found for this project.');
+      if (state.kind === "no_release") {
+        setReleaseButtonDisabled(
+          btn,
+          "No Release",
+          "No GitHub releases found for this project.",
+        );
         return;
       }
 
-      if (state.kind === 'no_asset') {
-        setReleaseButtonDisabled(btn, 'No Download', 'No downloadable release assets found.');
+      if (state.kind === "no_asset") {
+        setReleaseButtonDisabled(
+          btn,
+          "No Download",
+          "No downloadable release assets found.",
+        );
         return;
       }
 
-      if (state.kind === 'rate_limited') {
-        setReleaseButtonDisabled(btn, 'Rate Limited', 'GitHub rate limit exceeded. Please try again later.');
+      if (state.kind === "rate_limited") {
+        setReleaseButtonDisabled(
+          btn,
+          "Rate Limited",
+          "GitHub rate limit exceeded. Please try again later.",
+        );
         return;
       }
 
-      setReleaseButtonDisabled(btn, 'Unavailable', 'Unable to load release downloads right now.');
+      setReleaseButtonDisabled(
+        btn,
+        "Unavailable",
+        "Unable to load release downloads right now.",
+      );
     });
   }
 
   async function fetchLatestReleaseDownload(repoPath) {
-    if (!repoPath) throw new Error('Missing repo path');
+    if (!repoPath) throw new Error("Missing repo path");
     if (releaseInFlight.has(repoPath)) return releaseInFlight.get(repoPath);
 
     const p = (async () => {
       const now = Date.now();
       if (releasesRateLimitedUntil && now < releasesRateLimitedUntil) {
-        return { kind: 'rate_limited' };
+        return { kind: "rate_limited" };
       }
 
-      const [owner, repo] = repoPath.split('/');
-      if (!owner || !repo) return { kind: 'error' };
+      const [owner, repo] = repoPath.split("/");
+      if (!owner || !repo) return { kind: "error" };
 
       async function fetchJson(url) {
         const res = await fetch(url, {
           headers: {
-            Accept: 'application/vnd.github+json',
+            Accept: "application/vnd.github+json",
           },
         });
 
         if (!res.ok) {
-          const remaining = res.headers.get('x-ratelimit-remaining');
-          const reset = res.headers.get('x-ratelimit-reset');
+          const remaining = res.headers.get("x-ratelimit-remaining");
+          const reset = res.headers.get("x-ratelimit-reset");
 
-          if (res.status === 403 && remaining === '0') {
+          if (res.status === 403 && remaining === "0") {
             const resetSeconds = reset ? Number(reset) : 0;
             if (Number.isFinite(resetSeconds) && resetSeconds > 0) {
               releasesRateLimitedUntil = resetSeconds * 1000;
             }
-            return { ok: false, status: res.status, rateLimited: true, json: null };
+            return {
+              ok: false,
+              status: res.status,
+              rateLimited: true,
+              json: null,
+            };
           }
 
-          return { ok: false, status: res.status, rateLimited: false, json: null };
+          return {
+            ok: false,
+            status: res.status,
+            rateLimited: false,
+            json: null,
+          };
         }
 
         try {
-          return { ok: true, status: res.status, rateLimited: false, json: await res.json() };
+          return {
+            ok: true,
+            status: res.status,
+            rateLimited: false,
+            json: await res.json(),
+          };
         } catch {
-          return { ok: false, status: res.status, rateLimited: false, json: null };
+          return {
+            ok: false,
+            status: res.status,
+            rateLimited: false,
+            json: null,
+          };
         }
       }
 
       const encodedRepoPath = `${encodeURIComponent(owner)}/${encodeURIComponent(repo)}`;
 
-      const latest = await fetchJson(`https://api.github.com/repos/${encodedRepoPath}/releases/latest`);
+      const latest = await fetchJson(
+        `https://api.github.com/repos/${encodedRepoPath}/releases/latest`,
+      );
       if (latest.ok) {
         const best = pickBestAsset(latest.json && latest.json.assets);
         if (best && best.browser_download_url) {
-          return { kind: 'asset', url: best.browser_download_url, assetName: best.name || '' };
+          return {
+            kind: "asset",
+            url: best.browser_download_url,
+            assetName: best.name || "",
+          };
         }
-        return { kind: 'no_asset' };
+        return { kind: "no_asset" };
       }
-      if (latest.rateLimited) return { kind: 'rate_limited' };
+      if (latest.rateLimited) return { kind: "rate_limited" };
 
       if (latest.status === 404) {
-        const list = await fetchJson(`https://api.github.com/repos/${encodedRepoPath}/releases?per_page=10`);
-        if (list.rateLimited) return { kind: 'rate_limited' };
-        if (!list.ok) return { kind: 'no_release' };
+        const list = await fetchJson(
+          `https://api.github.com/repos/${encodedRepoPath}/releases?per_page=10`,
+        );
+        if (list.rateLimited) return { kind: "rate_limited" };
+        if (!list.ok) return { kind: "no_release" };
 
         const releases = Array.isArray(list.json) ? list.json : [];
         const firstPublished = releases.find((r) => r && !r.draft);
-        if (!firstPublished) return { kind: 'no_release' };
+        if (!firstPublished) return { kind: "no_release" };
 
         const best = pickBestAsset(firstPublished.assets);
         if (best && best.browser_download_url) {
-          return { kind: 'asset', url: best.browser_download_url, assetName: best.name || '' };
+          return {
+            kind: "asset",
+            url: best.browser_download_url,
+            assetName: best.name || "",
+          };
         }
-        return { kind: 'no_asset' };
+        return { kind: "no_asset" };
       }
 
-      return { kind: 'error' };
+      return { kind: "error" };
     })();
 
     releaseInFlight.set(repoPath, p);
@@ -392,13 +467,17 @@
 
   async function hydrateReleaseDownloads() {
     const buttons = Array.from(
-      document.querySelectorAll('[data-github-release-download][data-github-release-repo]'),
+      document.querySelectorAll(
+        "[data-github-release-download][data-github-release-repo]",
+      ),
     );
     if (!buttons.length) return;
 
     const byRepo = new Map();
     buttons.forEach((btn) => {
-      const repoPath = normalizeRepoPath(btn.getAttribute('data-github-release-repo'));
+      const repoPath = normalizeRepoPath(
+        btn.getAttribute("data-github-release-repo"),
+      );
       if (!repoPath) return;
       if (!byRepo.has(repoPath)) byRepo.set(repoPath, []);
       byRepo.get(repoPath).push(btn);
@@ -407,7 +486,14 @@
     byRepo.forEach((list, repoPath) => {
       const cached = getCachedRelease(repoPath);
       if (cached) applyReleaseDownloadState(repoPath, cached);
-      else list.forEach((btn) => setReleaseButtonDisabled(btn, 'Download', 'Fetching latest GitHub release...'));
+      else
+        list.forEach((btn) =>
+          setReleaseButtonDisabled(
+            btn,
+            "Download",
+            "Fetching latest GitHub release...",
+          ),
+        );
     });
 
     const fetches = [];
@@ -416,12 +502,13 @@
       fetches.push(
         fetchLatestReleaseDownload(repoPath)
           .then((state) => {
-            const normalized = state && typeof state === 'object' ? state : { kind: 'error' };
+            const normalized =
+              state && typeof state === "object" ? state : { kind: "error" };
             setCachedRelease(repoPath, normalized);
             applyReleaseDownloadState(repoPath, normalized);
           })
           .catch(() => {
-            const normalized = { kind: 'error' };
+            const normalized = { kind: "error" };
             setCachedRelease(repoPath, normalized);
             applyReleaseDownloadState(repoPath, normalized);
           }),
@@ -434,7 +521,7 @@
   function renderMeta(el, meta) {
     if (!el || !meta) return;
 
-    const language = meta.language || 'Unknown';
+    const language = meta.language || "Unknown";
     const stars = Number(meta.stars || 0).toLocaleString();
     const forks = Number(meta.forks || 0).toLocaleString();
     const updated = meta.updated_at ? formatDate(meta.updated_at) : null;
@@ -446,7 +533,7 @@
       ${
         updated
           ? `<span class="ml-auto text-neutral-500">Updated ${escapeHtml(updated)}</span>`
-          : ''
+          : ""
       }
     `;
 
@@ -454,30 +541,36 @@
   }
 
   async function fetchRepoMeta(repoPath) {
-    if (!repoPath) throw new Error('Missing repo path');
+    if (!repoPath) throw new Error("Missing repo path");
     if (inFlight.has(repoPath)) return inFlight.get(repoPath);
 
     const p = (async () => {
       const url = `https://api.github.com/repos/${repoPath}`;
       const res = await fetch(url, {
         headers: {
-          Accept: 'application/vnd.github+json',
+          Accept: "application/vnd.github+json",
         },
       });
 
       if (!res.ok) {
-        const remaining = res.headers.get('x-ratelimit-remaining');
-        if (res.status === 403 && remaining === '0') {
-          throw new Error('GitHub rate limit exceeded. Please try again later.');
+        const remaining = res.headers.get("x-ratelimit-remaining");
+        if (res.status === 403 && remaining === "0") {
+          throw new Error(
+            "GitHub rate limit exceeded. Please try again later.",
+          );
         }
         throw new Error(`GitHub request failed (${res.status}).`);
       }
 
       const repo = await res.json();
       return {
-        language: repo && repo.language ? String(repo.language) : 'Unknown',
-        stars: typeof (repo && repo.stargazers_count) === 'number' ? repo.stargazers_count : 0,
-        forks: typeof (repo && repo.forks_count) === 'number' ? repo.forks_count : 0,
+        language: repo && repo.language ? String(repo.language) : "Unknown",
+        stars:
+          typeof (repo && repo.stargazers_count) === "number"
+            ? repo.stargazers_count
+            : 0,
+        forks:
+          typeof (repo && repo.forks_count) === "number" ? repo.forks_count : 0,
         updated_at: repo && repo.updated_at ? String(repo.updated_at) : null,
       };
     })();
@@ -494,12 +587,14 @@
   }
 
   async function hydrateWebApps() {
-    const els = Array.from(document.querySelectorAll('[data-github-meta][data-github-repo]'));
+    const els = Array.from(
+      document.querySelectorAll("[data-github-meta][data-github-repo]"),
+    );
     if (!els.length) return;
 
     const byRepo = new Map();
     els.forEach((el) => {
-      const repoPath = String(el.getAttribute('data-github-repo') || '').trim();
+      const repoPath = String(el.getAttribute("data-github-repo") || "").trim();
       if (!repoPath) return;
       if (!byRepo.has(repoPath)) byRepo.set(repoPath, []);
       byRepo.get(repoPath).push(el);
@@ -533,16 +628,15 @@
   }
 
   function initWebAppsToggle() {
-    const grid = document.getElementById('web-apps-grid');
+    const grid = document.getElementById("web-apps-grid");
     if (grid) {
       ensureMoreToggle(grid);
     }
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener("DOMContentLoaded", () => {
     hydrateWebApps();
     hydrateReleaseDownloads();
     initWebAppsToggle();
   });
 })();
-

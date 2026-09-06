@@ -7,10 +7,17 @@
   "packageManager": "pnpm@11.24.0",
   "scripts": {
     "build": "tailwindcss -i ./public/css/input.css -o ./public/css/output.css --minify",
-    "watch": "tailwindcss -i ./public/css/input.css -o ./public/css/output.css --watch"
+    "start": "node server.js",
+    "watch": "tailwindcss -i ./public/css/input.css -o ./public/css/output.css --watch",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@tailwindcss/cli": "^4.1.10",
     "tailwindcss": "^4.1.10"
+  },
+  "devDependencies": {
+    "prettier": "^3.9.6",
+    "prettier-plugin-tailwindcss": "^0.8.1"
   }
 }

@@ -1,9 +1,9 @@
 // Fetch and display real-time statistics from Euphoria Development API
 (() => {
-  const STATS_URL = 'https://api.euphoriadevelopment.uk/stats/';
-  const ENDSTONE_CACHE_KEY = 'endstonePluginsCache:v1';
+  const STATS_URL = "https://api.euphoriadevelopment.uk/stats/";
+  const ENDSTONE_CACHE_KEY = "endstonePluginsCache:v1";
   const ENDSTONE_CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
-  const BLUEPRINT_CACHE_KEY = 'blueprintProductsCache:v2';
+  const BLUEPRINT_CACHE_KEY = "blueprintProductsCache:v2";
   const BLUEPRINT_CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
 
   const timers = new Map();
@@ -21,7 +21,7 @@
   }
 
   function getAppsCount() {
-    return document.querySelectorAll('#apps article').length;
+    return document.querySelectorAll("#apps article").length;
   }
 
   function loadCacheCount(key, ttlMs) {
@@ -45,7 +45,7 @@
     const duration = safeInt(options.durationMs, 1200);
     const target = safeInt(targetValue, 0);
 
-    const currentText = String(element.textContent || '').replace(/[^\d]/g, '');
+    const currentText = String(element.textContent || "").replace(/[^\d]/g, "");
     const start = safeInt(currentText, 0);
 
     if (timers.has(elementId)) {
@@ -85,32 +85,48 @@
     const endstone = safeInt(state.endstoneCount, 0);
 
     const totalProjects = blueprint + apps + endstone;
-    animateCounter('total-projects', totalProjects, { durationMs: 900 });
+    animateCounter("total-projects", totalProjects, { durationMs: 900 });
   }
 
   async function loadStats() {
     state.appsCount = getAppsCount();
 
     // Prefer cached Endstone plugin count if available (avoids waiting for GitHub fetch).
-    const cachedEndstone = loadCacheCount(ENDSTONE_CACHE_KEY, ENDSTONE_CACHE_TTL_MS);
+    const cachedEndstone = loadCacheCount(
+      ENDSTONE_CACHE_KEY,
+      ENDSTONE_CACHE_TTL_MS,
+    );
     if (cachedEndstone !== null) state.endstoneCount = cachedEndstone;
 
     try {
-      const response = await fetch(STATS_URL, { headers: { Accept: 'application/json' } });
+      const response = await fetch(STATS_URL, {
+        headers: { Accept: "application/json" },
+      });
       const data = await response.json();
 
       // Count Blueprint addons + themes (the API returns both in blueprintExtensions).
-      const blueprintExtensions = Array.isArray(data && data.blueprintExtensions) ? data.blueprintExtensions : [];
+      const blueprintExtensions = Array.isArray(
+        data && data.blueprintExtensions,
+      )
+        ? data.blueprintExtensions
+        : [];
       state.blueprintCount = blueprintExtensions.length;
 
-      animateCounter('api-calls', safeInt(data && data.totalApiCalls, 0), { durationMs: 1500 });
-      animateCounter('active-panels', safeInt(data && data.totalInstalls, 0), { durationMs: 1500 });
+      animateCounter("api-calls", safeInt(data && data.totalApiCalls, 0), {
+        durationMs: 1500,
+      });
+      animateCounter("active-panels", safeInt(data && data.totalInstalls, 0), {
+        durationMs: 1500,
+      });
       updateTotalProjects();
     } catch (error) {
-      console.error('Error fetching stats:', error);
+      console.error("Error fetching stats:", error);
 
       // Fall back to cached Blueprint product list (if available).
-      const cachedBlueprint = loadCacheCount(BLUEPRINT_CACHE_KEY, BLUEPRINT_CACHE_TTL_MS);
+      const cachedBlueprint = loadCacheCount(
+        BLUEPRINT_CACHE_KEY,
+        BLUEPRINT_CACHE_TTL_MS,
+      );
       if (cachedBlueprint !== null) {
         state.blueprintCount = cachedBlueprint;
         updateTotalProjects();
@@ -121,12 +137,12 @@
   }
 
   // When Endstone plugins finish loading, update the total projects count.
-  window.addEventListener('endstone-plugins:count', (e) => {
+  window.addEventListener("endstone-plugins:count", (e) => {
     const count = safeInt(e && e.detail ? e.detail.count : 0, 0);
     state.endstoneCount = count;
     updateTotalProjects();
   });
 
   // Load stats when page loads
-  document.addEventListener('DOMContentLoaded', loadStats);
+  document.addEventListener("DOMContentLoaded", loadStats);
 })();
