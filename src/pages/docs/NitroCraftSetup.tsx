@@ -30,7 +30,6 @@ export function NitroCraftSetup() {
             <h2>Community</h2>
             <nav>
               <Link to="/docs/community/web-apps">Web Apps</Link>
-              <Link to="/docs/community/streamlink">StreamLink</Link>
               <Link to="/docs/community/euphoria-licensing">
                 Euphoria Licensing
               </Link>
@@ -44,9 +43,6 @@ export function NitroCraftSetup() {
                 Blueprint Addons
               </Link>
               <Link to="/docs/community/refresh-theme">Refresh Theme</Link>
-              <Link to="/docs/community/endstone-plugins">
-                Endstone Plugins
-              </Link>
             </nav>
           </aside>
           <div className="docs-content panel-grid">

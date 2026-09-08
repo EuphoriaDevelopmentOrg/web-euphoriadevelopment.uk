@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
+import { CrafatarMigrationNotice } from "../../components/CrafatarMigrationNotice";
 
 export function CrafatarSetup() {
   useEffect(() => {
@@ -30,7 +31,6 @@ export function CrafatarSetup() {
             <h2>Community</h2>
             <nav>
               <Link to="/docs/community/web-apps">Web Apps</Link>
-              <Link to="/docs/community/streamlink">StreamLink</Link>
               <Link to="/docs/community/euphoria-licensing">
                 Euphoria Licensing
               </Link>
@@ -46,24 +46,16 @@ export function CrafatarSetup() {
                 Blueprint Addons
               </Link>
               <Link to="/docs/community/refresh-theme">Refresh Theme</Link>
-              <Link to="/docs/community/endstone-plugins">
-                Endstone Plugins
-              </Link>
             </nav>
           </aside>
           <div className="docs-content panel-grid">
+            <CrafatarMigrationNotice />
             <article className="panel">
-              <h2>Deployment Options</h2>
-              <ul>
-                <li>
-                  <strong>Hosted:</strong> use{" "}
-                  <code>https://crafatar.euphoriadevelopment.uk</code> directly.
-                </li>
-                <li>
-                  <strong>Self-hosted:</strong> deploy with Docker, Docker
-                  Compose, Pterodactyl Panel, or Node.js with Redis.
-                </li>
-              </ul>
+              <h2>Legacy Deployment Options</h2>
+              <p>
+                These instructions cover self-hosted Crafatar using Docker,
+                Docker Compose, Pterodactyl Panel, or Node.js with Redis.
+              </p>
               <div className="callout">
                 <p>
                   For endpoint and parameter reference, use{" "}
@@ -88,9 +80,9 @@ export function CrafatarSetup() {
               </p>
             </article>
             <article className="panel">
-              <h2>Docker Compose (Recommended)</h2>
+              <h2>Docker Compose</h2>
               <p>
-                Uses the repository&apos;s maintained{" "}
+                Uses the legacy repository&apos;s{" "}
                 <code>docker-compose.yml</code> with Redis health checks and
                 persistent volumes.
               </p>

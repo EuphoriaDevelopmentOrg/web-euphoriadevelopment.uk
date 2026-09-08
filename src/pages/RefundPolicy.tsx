@@ -4,6 +4,7 @@ export function RefundPolicy() {
   return (
     <LegalPolicyPage
       policy={{
+        theme: "refund",
         kicker: "Legal + Billing",
         title: "Refund Policy",
         summary:

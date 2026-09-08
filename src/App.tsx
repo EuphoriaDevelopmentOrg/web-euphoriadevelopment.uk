@@ -15,7 +15,6 @@ import { ServerBackgrounds } from "./pages/docs/ServerBackgrounds";
 import { Translations } from "./pages/docs/Translations";
 import { ResourceAlerts } from "./pages/docs/ResourceAlerts";
 import { WebApps } from "./pages/docs/WebApps";
-import { StreamLink } from "./pages/docs/StreamLink";
 import { EuphoriaLicensing } from "./pages/docs/EuphoriaLicensing";
 import { CrafatarApi } from "./pages/docs/CrafatarApi";
 import { CrafatarSetup } from "./pages/docs/CrafatarSetup";
@@ -23,7 +22,6 @@ import { NitroCraftApi } from "./pages/docs/NitroCraftApi";
 import { NitroCraftSetup } from "./pages/docs/NitroCraftSetup";
 import { BlueprintAddons } from "./pages/docs/BlueprintAddons";
 import { CommunityRefreshTheme } from "./pages/docs/CommunityRefreshTheme";
-import { EndstonePlugins } from "./pages/docs/EndstonePlugins";
 import { LegalAndTerms } from "./pages/docs/LegalAndTerms";
 import { PrivacyPolicy } from "./pages/PrivacyPolicy";
 import { RefundPolicy } from "./pages/RefundPolicy";
@@ -76,7 +74,6 @@ export function App() {
           element={<ResourceAlerts />}
         />
         <Route path="/docs/community/web-apps" element={<WebApps />} />
-        <Route path="/docs/community/streamlink" element={<StreamLink />} />
         <Route
           path="/docs/community/euphoria-licensing"
           element={<EuphoriaLicensing />}
@@ -101,10 +98,6 @@ export function App() {
         <Route
           path="/docs/community/refresh-theme"
           element={<CommunityRefreshTheme />}
-        />
-        <Route
-          path="/docs/community/endstone-plugins"
-          element={<EndstonePlugins />}
         />
         <Route
           path="/docs/legal-and-terms/terms-and-conditions"

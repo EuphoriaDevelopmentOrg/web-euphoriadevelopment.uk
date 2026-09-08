@@ -1,8 +1,9 @@
-import { type CSSProperties, type ReactNode } from "react";
+import { useEffect, type CSSProperties, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 
 type Section = { id: string; title: string; content: ReactNode | string[] };
 type Policy = {
+  theme: "privacy" | "refund" | "terms";
   kicker: string;
   title: string;
   summary: string;
@@ -22,6 +23,12 @@ const legalLinks = [
 ] as const;
 
 export function LegalPolicyPage({ policy }: { policy: Policy }) {
+  useEffect(() => {
+    const themeClass = `legal-${policy.theme}`;
+    document.body.classList.add("legal-page", themeClass);
+    return () => document.body.classList.remove("legal-page", themeClass);
+  }, [policy.theme]);
+
   return (
     <>
       <header className="site-header">

@@ -4,6 +4,7 @@ export function PrivacyPolicy() {
   return (
     <LegalPolicyPage
       policy={{
+        theme: "privacy",
         kicker: "Legal + Privacy",
         title: "Privacy Policy",
         summary:

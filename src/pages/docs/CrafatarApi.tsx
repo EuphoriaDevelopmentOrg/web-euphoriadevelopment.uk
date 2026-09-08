@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
+import { CrafatarMigrationNotice } from "../../components/CrafatarMigrationNotice";
 
 export function CrafatarApi() {
   useEffect(() => {
@@ -30,7 +31,6 @@ export function CrafatarApi() {
             <h2>Community</h2>
             <nav>
               <Link to="/docs/community/web-apps">Web Apps</Link>
-              <Link to="/docs/community/streamlink">StreamLink</Link>
               <Link to="/docs/community/euphoria-licensing">
                 Euphoria Licensing
               </Link>
@@ -46,55 +46,34 @@ export function CrafatarApi() {
                 Blueprint Addons
               </Link>
               <Link to="/docs/community/refresh-theme">Refresh Theme</Link>
-              <Link to="/docs/community/endstone-plugins">
-                Endstone Plugins
-              </Link>
             </nav>
           </aside>
           <div className="docs-content panel-grid">
+            <CrafatarMigrationNotice />
             <article className="panel">
-              <h2>API Overview</h2>
+              <h2>Legacy API Overview</h2>
               <p>
                 Crafatar serves Minecraft avatars, skins, capes, and renders as
                 PNG images using UUID-based routes.
               </p>
               <p>
-                Hosted base URL:{" "}
+                Previous hosted base URL:{" "}
                 <code>https://crafatar.euphoriadevelopment.uk</code>
               </p>
               <p>
                 Supported methods: <code>GET</code> and <code>HEAD</code>.
               </p>
               <div className="callout">
-                <p>
-                  Only UUIDs are supported; usernames are rejected. For a full
-                  rewrite, see{" "}
-                  <a
-                    href="https://github.com/EuphoriaDevelopmentOrg/NitroCraft"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    NitroCraft
-                  </a>
-                  .
-                </p>
+                <p>Only UUIDs are supported; usernames are rejected.</p>
               </div>
               <div className="doc-actions">
-                <a
-                  className="text-link"
-                  href="https://crafatar.euphoriadevelopment.uk/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Open Crafatar
-                </a>
                 <a
                   className="text-link"
                   href="https://github.com/EuphoriaTheme/crafatar"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Source Repository
+                  Legacy Source Repository
                 </a>
               </div>
             </article>

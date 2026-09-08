@@ -54,7 +54,6 @@ export function CommunityRefreshTheme() {
             <h2>Community</h2>
             <nav>
               <Link to="/docs/community/web-apps">Web Apps</Link>
-              <Link to="/docs/community/streamlink">StreamLink</Link>
               <Link to="/docs/community/euphoria-licensing">
                 Euphoria Licensing
               </Link>
@@ -69,9 +68,6 @@ export function CommunityRefreshTheme() {
               </Link>
               <Link className="active" to="/docs/community/refresh-theme">
                 Refresh Theme
-              </Link>
-              <Link to="/docs/community/endstone-plugins">
-                Endstone Plugins
               </Link>
             </nav>
           </aside>
@@ -178,11 +174,8 @@ export function CommunityRefreshTheme() {
                 >
                   ← Blueprint Addons
                 </Link>
-                <Link
-                  className="text-link"
-                  to="/docs/community/endstone-plugins"
-                >
-                  Endstone Plugins →
+                <Link className="text-link" to="/docs">
+                  Back to Docs Home →
                 </Link>
               </div>
             </article>

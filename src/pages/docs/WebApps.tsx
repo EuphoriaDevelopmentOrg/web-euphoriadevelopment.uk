@@ -1,15 +1,13 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { euphoriaLicensing, freePaste, paidPaste } from "../../utils/web-apps";
 
 type RepoMeta = { forks: number; stars: number; language: string | null };
 
 const repositories = {
-  paste: "EuphoriaTheme/Euphoria-Paste",
-  streamLink: "EuphoriaDevelopmentOrg/StreamLink",
-  crafatar: "EuphoriaTheme/crafatar",
+  paste: freePaste.repository,
   nitroCraft: "EuphoriaDevelopmentOrg/NitroCraft",
-  eventer: "RepGraphics/eventer",
 } as const;
 
 export function WebApps() {
@@ -86,7 +84,6 @@ export function WebApps() {
               <Link className="active" to="/docs/community/web-apps">
                 Web Apps
               </Link>
-              <Link to="/docs/community/streamlink">StreamLink</Link>
               <Link to="/docs/community/euphoria-licensing">
                 Euphoria Licensing
               </Link>
@@ -100,9 +97,6 @@ export function WebApps() {
                 Blueprint Addons
               </Link>
               <Link to="/docs/community/refresh-theme">Refresh Theme</Link>
-              <Link to="/docs/community/endstone-plugins">
-                Endstone Plugins
-              </Link>
             </nav>
           </aside>
           <div className="docs-content panel-grid">
@@ -114,9 +108,9 @@ export function WebApps() {
               </p>
               <div className="callout">
                 <p>
-                  Projects may be paid or open-source. Crafatar is a maintained
-                  update of the original project, while NitroCraft is a complete
-                  remake. Open-source entries below show live GitHub metadata.
+                  Projects may be paid or open-source. Crafatar has moved to
+                  NitroCraft. Open-source entries below show live GitHub
+                  metadata.
                 </p>
               </div>
             </article>
@@ -124,37 +118,54 @@ export function WebApps() {
               <h2>Available Apps</h2>
               <div className="doc-list">
                 <div className="doc-item">
-                  <h3>Euphoria Paste (Paid)</h3>
+                  <h3>{paidPaste.name}</h3>
                   <div className="doc-meta">
                     <span>Paid</span>
                     <span>Paste Platform</span>
                   </div>
                   <div className="doc-actions">
-                    <a
-                      className="text-link"
-                      href="https://builtbybit.com/resources/euphoria-paste.57974/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      View Paid Version
-                    </a>
+                    {paidPaste.links.map(({ label, href }) => (
+                      <a
+                        key={href}
+                        className="text-link"
+                        href={href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {label}
+                      </a>
+                    ))}
                   </div>
                 </div>
                 <div className="doc-item">
-                  <h3>Euphoria Paste (Open Source)</h3>
-                  <div className="doc-meta">{meta("paste")}</div>
+                  <h3>{freePaste.name}</h3>
+                  <div className="doc-meta">
+                    <span>Free</span>
+                    {meta("paste")}
+                  </div>
                   <p>
                     Open-source fork of Haste, a pastebin written for Node.js.
                   </p>
                   <div className="doc-actions">
                     <a
                       className="text-link"
-                      href="https://github.com/EuphoriaTheme/Euphoria-Paste"
+                      href={`https://github.com/${freePaste.repository}`}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
                       View on GitHub
                     </a>
+                    {freePaste.links.map(({ label, href }) => (
+                      <a
+                        key={href}
+                        className="text-link"
+                        href={href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {label}
+                      </a>
+                    ))}
                   </div>
                 </div>
                 <div className="doc-item">
@@ -168,6 +179,17 @@ export function WebApps() {
                     distribution controls, and admin management.
                   </p>
                   <div className="doc-actions">
+                    {euphoriaLicensing.links.map(({ label, href }) => (
+                      <a
+                        key={href}
+                        className="text-link"
+                        href={href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {label}
+                      </a>
+                    ))}
                     <Link
                       className="text-link"
                       to="/docs/community/euphoria-licensing"
@@ -177,61 +199,34 @@ export function WebApps() {
                   </div>
                 </div>
                 <div className="doc-item">
-                  <h3>StreamLink</h3>
-                  <div className="doc-meta">{meta("streamLink")}</div>
-                  <p>
-                    Cross-platform Xbox streaming client scaffold with a shared
-                    Nuxt app and desktop/mobile wrappers.
-                  </p>
-                  <div className="doc-actions">
-                    <a
-                      className="text-link"
-                      href="https://github.com/EuphoriaDevelopmentOrg/StreamLink"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      View on GitHub
-                    </a>
-                    <Link className="text-link" to="/docs/community/streamlink">
-                      Setup Docs
-                    </Link>
-                  </div>
-                </div>
-                <div className="doc-item">
                   <h3>Crafatar</h3>
-                  <div className="doc-meta">{meta("crafatar")}</div>
+                  <div className="doc-meta">
+                    <span>Moved to NitroCraft</span>
+                  </div>
                   <p>
-                    Maintained update of the original Crafatar project for
+                    Crafatar has moved to NitroCraft. Use NitroCraft for
                     Minecraft profile assets and renders.
                   </p>
                   <div className="doc-actions">
                     <a
                       className="text-link"
-                      href="https://crafatar.euphoriadevelopment.uk/"
+                      href="https://nitrocraft.uk"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      Open Web App
-                    </a>
-                    <a
-                      className="text-link"
-                      href="https://github.com/EuphoriaTheme/crafatar"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      View on GitHub
+                      Open NitroCraft
                     </a>
                     <Link
                       className="text-link"
-                      to="/docs/community/crafatar-api"
+                      to="/docs/community/nitrocraft-api"
                     >
-                      API Docs
+                      NitroCraft API Docs
                     </Link>
                     <Link
                       className="text-link"
-                      to="/docs/community/crafatar-setup"
+                      to="/docs/community/nitrocraft-setup"
                     >
-                      Setup Guide
+                      NitroCraft Setup Guide
                     </Link>
                   </div>
                 </div>
@@ -271,21 +266,6 @@ export function WebApps() {
                     >
                       Setup Guide
                     </Link>
-                  </div>
-                </div>
-                <div className="doc-item">
-                  <h3>Eventer</h3>
-                  <div className="doc-meta">{meta("eventer")}</div>
-                  <p>Making scheduling easy.</p>
-                  <div className="doc-actions">
-                    <a
-                      className="text-link"
-                      href="https://github.com/RepGraphics/eventer"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      View on GitHub
-                    </a>
                   </div>
                 </div>
               </div>

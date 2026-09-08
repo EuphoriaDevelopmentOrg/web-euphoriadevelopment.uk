@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
+import { euphoriaLicensing } from "../../utils/web-apps";
 
 export function EuphoriaLicensing() {
   useEffect(() => {
@@ -30,7 +31,6 @@ export function EuphoriaLicensing() {
             <h2>Community</h2>
             <nav>
               <Link to="/docs/community/web-apps">Web Apps</Link>
-              <Link to="/docs/community/streamlink">StreamLink</Link>
               <Link className="active" to="/docs/community/euphoria-licensing">
                 Euphoria Licensing
               </Link>
@@ -44,9 +44,6 @@ export function EuphoriaLicensing() {
                 Blueprint Addons
               </Link>
               <Link to="/docs/community/refresh-theme">Refresh Theme</Link>
-              <Link to="/docs/community/endstone-plugins">
-                Endstone Plugins
-              </Link>
             </nav>
           </aside>
           <div className="docs-content panel-grid">
@@ -65,6 +62,17 @@ export function EuphoriaLicensing() {
                 </p>
               </div>
               <div className="doc-actions">
+                {euphoriaLicensing.links.map(({ label, href }) => (
+                  <a
+                    key={href}
+                    className="text-link"
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {label}
+                  </a>
+                ))}
                 <Link className="text-link" to="/docs/general-guides/licensing">
                   Licensing Guide
                 </Link>

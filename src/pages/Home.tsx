@@ -1,11 +1,31 @@
+import {
+  Activity,
+  AppWindow,
+  ArrowRight,
+  ArrowUpRight,
+  BookOpen,
+  Boxes,
+  ChartColumn,
+  CodeXml,
+  ExternalLink,
+  GitFork,
+  Handshake,
+  Heart,
+  Menu,
+  MessageCircle,
+  Palette,
+  Puzzle,
+  Server,
+  Star,
+  Tag,
+  Users,
+  X,
+  type LucideIcon,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { fetchContributors, type Contributor } from "../utils/contributors";
 import { fetchDonators, type Donator } from "../utils/donators";
-import {
-  fetchEndstonePlugins,
-  type EndstonePlugin,
-} from "../utils/endstone-plugins";
 import {
   fetchBlueprintProducts,
   type BlueprintProduct,
@@ -14,12 +34,11 @@ import { fetchSiteStats, type SiteStats } from "../utils/stats";
 import { fetchWebApps, type WebApp } from "../utils/web-apps";
 
 const navigation = [
-  ["#statistics", "Statistics"],
-  ["#contributors", "Contributors"],
-  ["#donators", "Donators"],
-  ["#products", "Blueprints"],
-  ["#apps", "Web Apps"],
-  ["#endstone", "Minecraft Plugins"],
+  ["#statistics", "Statistics", ChartColumn],
+  ["#contributors", "Contributors", Users],
+  ["#donators", "Donators", Heart],
+  ["#products", "Blueprints", Puzzle],
+  ["#apps", "Web Apps", AppWindow],
 ] as const;
 const skeleton = (
   <div className="glass shimmer h-40 rounded-lg border border-neutral-800" />
@@ -32,9 +51,6 @@ export function Home() {
   const [stats, setStats] = useState<SiteStats | null>(null);
   const [products, setProducts] = useState<BlueprintProduct[] | null>(null);
   const [webApps, setWebApps] = useState<WebApp[] | null>(null);
-  const [endstonePlugins, setEndstonePlugins] = useState<
-    EndstonePlugin[] | null
-  >(null);
 
   useEffect(() => {
     document.body.classList.add(
@@ -57,9 +73,6 @@ export function Home() {
     void fetchWebApps()
       .then(setWebApps)
       .catch(() => setWebApps([]));
-    void fetchEndstonePlugins()
-      .then(setEndstonePlugins)
-      .catch(() => setEndstonePlugins([]));
     return () => {
       document.body.classList.remove(
         "min-h-screen",
@@ -92,36 +105,58 @@ export function Home() {
           />
           Euphoria Development
         </a>
-        <div className="hidden gap-5 md:flex">
-          {navigation.map(([href, label]) => (
+        <div className="hidden gap-4 lg:flex">
+          {navigation.map(([href, label, Icon]) => (
             <a
               key={href}
               href={href}
-              className="text-sm font-medium hover:text-blue-300"
+              className="inline-flex items-center gap-2 text-sm font-medium whitespace-nowrap hover:text-blue-300"
             >
+              <Icon aria-hidden="true" className="size-4 shrink-0" />
               {label}
             </a>
           ))}
-          <Link to="/docs" className="text-sm font-medium hover:text-blue-300">
+          <Link
+            to="/docs"
+            className="inline-flex items-center gap-2 text-sm font-medium hover:text-blue-300"
+          >
+            <BookOpen aria-hidden="true" className="size-4 shrink-0" />
             Docs
           </Link>
         </div>
         <button
           type="button"
-          className="rounded-lg border border-neutral-700 p-2 md:hidden"
+          className="inline-flex items-center gap-2 rounded-lg border border-neutral-700 p-2 lg:hidden"
           aria-expanded={menuOpen}
+          aria-controls="mobile-navigation"
           onClick={() => setMenuOpen(!menuOpen)}
         >
-          Menu
+          {menuOpen ? (
+            <X aria-hidden="true" className="size-5 shrink-0" />
+          ) : (
+            <Menu aria-hidden="true" className="size-5 shrink-0" />
+          )}
+          {menuOpen ? "Close" : "Menu"}
         </button>
         {menuOpen && (
-          <div className="mobile-menu">
-            {navigation.map(([href, label]) => (
-              <a key={href} href={href} onClick={() => setMenuOpen(false)}>
+          <div id="mobile-navigation" className="mobile-menu flex lg:hidden">
+            {navigation.map(([href, label, Icon]) => (
+              <a
+                key={href}
+                href={href}
+                className="inline-flex items-center gap-2"
+                onClick={() => setMenuOpen(false)}
+              >
+                <Icon aria-hidden="true" className="size-4 shrink-0" />
                 {label}
               </a>
             ))}
-            <Link to="/docs" onClick={() => setMenuOpen(false)}>
+            <Link
+              to="/docs"
+              className="inline-flex items-center gap-2"
+              onClick={() => setMenuOpen(false)}
+            >
+              <BookOpen aria-hidden="true" className="size-4 shrink-0" />
               Docs
             </Link>
           </div>
@@ -136,13 +171,14 @@ export function Home() {
             </h1>
             <p className="fade-in-up mx-auto mt-5 max-w-2xl text-lg text-neutral-400 delay-100 sm:text-2xl">
               Blueprint-powered themes and extensions for Pterodactyl Panel,
-              plus open-source Endstone plugins for Minecraft servers.
+              plus web apps and APIs for your community.
             </p>
             <a
               href="#products"
-              className="fade-in-up mt-8 inline-flex rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white delay-200 hover:bg-blue-500"
+              className="fade-in-up mt-8 inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white delay-200 hover:bg-blue-500"
             >
               Browse Blueprints
+              <ArrowRight aria-hidden="true" className="size-5 shrink-0" />
             </a>
           </div>
         </section>
@@ -163,7 +199,6 @@ export function Home() {
         <GetInvolved />
         <Products products={products} />
         <WebApps apps={webApps} />
-        <EndstonePlugins plugins={endstonePlugins} />
         <footer className="glass mt-4 border-t border-neutral-800 px-4 py-8 text-center text-neutral-400">
           <p>© 2026 Euphoria Development. All rights reserved.</p>
           <div className="mt-3 flex justify-center gap-3 text-sm">
@@ -184,24 +219,54 @@ function Stats({ stats }: { stats: SiteStats | null }) {
       className="glass-light border-y border-neutral-800 px-4 py-12"
     >
       <div className="mx-auto grid max-w-6xl gap-5 sm:grid-cols-3">
-        <Stat label="Total Projects" value={9} />
-        <Stat label="API Calls" value={stats ? stats.totalApiCalls : 12727} />
+        <Stat label="Total Projects" value={9} icon={Boxes} />
+        <Stat
+          label="API Calls"
+          value={stats ? stats.totalApiCalls : 12727}
+          icon={Activity}
+        />
         <Stat
           label="Active Panels"
           value={stats ? stats.totalInstalls : 1275}
+          icon={Server}
         />
       </div>
     </section>
   );
 }
-function Stat({ label, value }: { label: string; value: number }) {
+function Stat({
+  label,
+  value,
+  icon: Icon,
+}: {
+  label: string;
+  value: number;
+  icon: LucideIcon;
+}) {
   return (
     <div className="glass card-hover rounded-lg border border-neutral-800 p-6">
-      <strong className="text-3xl text-blue-400">
-        {value.toLocaleString()}
-      </strong>
+      <div className="flex items-center justify-between gap-3">
+        <strong className="text-3xl text-blue-400">
+          {value.toLocaleString()}
+        </strong>
+        <Icon aria-hidden="true" className="size-7 shrink-0 text-blue-400" />
+      </div>
       <p className="mt-1 text-neutral-400">{label}</p>
     </div>
+  );
+}
+function SectionTitle({
+  title,
+  icon: Icon,
+}: {
+  title: string;
+  icon: LucideIcon;
+}) {
+  return (
+    <h2 className="flex items-center justify-center gap-3 text-3xl font-bold">
+      <Icon aria-hidden="true" className="size-7 shrink-0 text-blue-400" />
+      {title}
+    </h2>
   );
 }
 function PeopleSection({
@@ -220,7 +285,10 @@ function PeopleSection({
   return (
     <section id={id} className={`px-4 py-12 ${className}`}>
       <div className="mx-auto max-w-6xl text-center">
-        <h2 className="text-3xl font-bold">{title}</h2>
+        <SectionTitle
+          title={title}
+          icon={kind === "contributor" ? Users : Heart}
+        />
         <div className="mt-8 grid grid-cols-1 gap-5 text-left sm:grid-cols-2 lg:grid-cols-3">
           {people === null && skeleton}
           {people?.length === 0 && (
@@ -301,7 +369,7 @@ function GetInvolved() {
       id="get-involved"
       className="bg-neutral-900 px-4 py-12 text-center"
     >
-      <h2 className="text-3xl font-bold">Get Involved</h2>
+      <SectionTitle title="Get Involved" icon={Handshake} />
       <p className="mx-auto mt-4 max-w-2xl text-neutral-400">
         Build, support, and shape Euphoria Development with the community.
       </p>
@@ -310,16 +378,19 @@ function GetInvolved() {
           title="GitHub"
           text="Contribute to our open-source projects."
           href="https://github.com/EuphoriaDevelopmentOrg"
+          icon={CodeXml}
         />
         <Action
           title="Discord"
           text="Join the community and get support."
           href="https://discord.euphoriadevelopment.uk"
+          icon={MessageCircle}
         />
         <Action
           title="Support"
           text="Help fund ongoing development."
           href="https://github.com/sponsors/RepGraphics"
+          icon={Heart}
         />
       </div>
     </section>
@@ -329,10 +400,12 @@ function Action({
   title,
   text,
   href,
+  icon: Icon,
 }: {
   title: string;
   text: string;
   href: string;
+  icon: LucideIcon;
 }) {
   return (
     <a
@@ -341,7 +414,14 @@ function Action({
       target="_blank"
       rel="noopener noreferrer"
     >
-      <h3 className="text-xl font-semibold">{title}</h3>
+      <Icon aria-hidden="true" className="mx-auto mb-4 size-8 text-blue-400" />
+      <h3 className="flex items-center justify-center gap-2 text-xl font-semibold">
+        {title}
+        <ArrowUpRight
+          aria-hidden="true"
+          className="size-4 shrink-0 text-neutral-400"
+        />
+      </h3>
       <p className="mt-2 text-neutral-400">{text}</p>
     </a>
   );
@@ -352,9 +432,13 @@ function Products({ products }: { products: BlueprintProduct[] | null }) {
   return (
     <section id="products" className="px-4 py-12">
       <div className="mx-auto max-w-6xl">
-        <h2 className="text-center text-3xl font-bold">Blueprints</h2>
+        <SectionTitle title="Blueprints" icon={Puzzle} />
         <div className="mt-10">
-          <h3 className="text-xl font-semibold">
+          <h3 className="flex items-center gap-2 text-xl font-semibold">
+            <Puzzle
+              aria-hidden="true"
+              className="size-5 shrink-0 text-blue-400"
+            />
             Blueprint Addons{" "}
             <span className="text-base font-normal text-neutral-400">
               ({products === null ? "…" : addons.length})
@@ -367,7 +451,11 @@ function Products({ products }: { products: BlueprintProduct[] | null }) {
           />
         </div>
         <div className="mt-10">
-          <h3 className="text-xl font-semibold">
+          <h3 className="flex items-center gap-2 text-xl font-semibold">
+            <Palette
+              aria-hidden="true"
+              className="size-5 shrink-0 text-blue-400"
+            />
             Blueprint Themes{" "}
             <span className="text-base font-normal text-neutral-400">
               ({products === null ? "…" : themes.length})
@@ -448,10 +536,19 @@ function ProductCard({ product }: { product: BlueprintProduct }) {
         }}
       />
       <div className="mt-4 flex flex-wrap gap-2 text-xs text-neutral-400">
-        <span>{product.priceLabel}</span>
-        <span>{product.panels.toLocaleString()} active panels</span>
+        <span className="inline-flex items-center gap-1">
+          <Tag aria-hidden="true" className="size-3.5 shrink-0" />
+          {product.priceLabel}
+        </span>
+        <span className="inline-flex items-center gap-1">
+          <Server aria-hidden="true" className="size-3.5 shrink-0" />
+          {product.panels.toLocaleString()} active panels
+        </span>
         {product.githubStars !== null && (
-          <span>{product.githubStars.toLocaleString()} stars</span>
+          <span className="inline-flex items-center gap-1">
+            <Star aria-hidden="true" className="size-3.5 shrink-0" />
+            {product.githubStars.toLocaleString()} stars
+          </span>
         )}
       </div>
       <div className="mt-4 flex flex-wrap gap-2">
@@ -463,9 +560,10 @@ function ProductCard({ product }: { product: BlueprintProduct }) {
                 href={href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm font-semibold text-neutral-100 hover:bg-neutral-700"
+                className="inline-flex items-center gap-2 rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm font-semibold text-neutral-100 hover:bg-neutral-700"
               >
                 {label}
+                <ExternalLink aria-hidden="true" className="size-4 shrink-0" />
               </a>
             ),
         )}
@@ -477,7 +575,7 @@ function WebApps({ apps }: { apps: WebApp[] | null }) {
   return (
     <section id="apps" className="bg-neutral-900 px-4 py-12">
       <div className="mx-auto max-w-6xl text-center">
-        <h2 className="text-3xl font-bold">Web Apps</h2>
+        <SectionTitle title="Web Apps" icon={AppWindow} />
         <div className="mt-8 grid grid-cols-1 gap-5 text-left sm:grid-cols-2 lg:grid-cols-3">
           {apps === null && skeleton}
           {apps?.length === 0 && (
@@ -499,8 +597,17 @@ function WebApps({ apps }: { apps: WebApp[] | null }) {
                 {app.meta && (
                   <>
                     <span>{app.meta.language ?? "Unknown"}</span>
-                    <span>{app.meta.stars.toLocaleString()} stars</span>
-                    <span>{app.meta.forks.toLocaleString()} forks</span>
+                    <span className="inline-flex items-center gap-1">
+                      <Star aria-hidden="true" className="size-3.5 shrink-0" />
+                      {app.meta.stars.toLocaleString()} stars
+                    </span>
+                    <span className="inline-flex items-center gap-1">
+                      <GitFork
+                        aria-hidden="true"
+                        className="size-3.5 shrink-0"
+                      />
+                      {app.meta.forks.toLocaleString()} forks
+                    </span>
                     {app.meta.updated && (
                       <span>Updated {app.meta.updated}</span>
                     )}
@@ -508,72 +615,36 @@ function WebApps({ apps }: { apps: WebApp[] | null }) {
                 )}
               </div>
               <div className="mt-4 flex flex-wrap gap-2">
-                {app.website && (
+                {app.links.map(({ label, href }, index) => (
                   <a
-                    className="rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-500"
-                    href={app.website}
+                    key={href}
+                    className={
+                      index === 0
+                        ? "inline-flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-500"
+                        : "inline-flex items-center gap-2 rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm font-semibold text-neutral-100 hover:bg-neutral-700"
+                    }
+                    href={href}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    Open App
+                    {label}
+                    <ExternalLink
+                      aria-hidden="true"
+                      className="size-4 shrink-0"
+                    />
                   </a>
-                )}
+                ))}
                 {app.repository && (
                   <a
-                    className="rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm font-semibold text-neutral-100 hover:bg-neutral-700"
+                    className="inline-flex items-center gap-2 rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm font-semibold text-neutral-100 hover:bg-neutral-700"
                     href={`https://github.com/${app.repository}`}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
                     GitHub
+                    <CodeXml aria-hidden="true" className="size-4 shrink-0" />
                   </a>
                 )}
-              </div>
-            </article>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-function EndstonePlugins({ plugins }: { plugins: EndstonePlugin[] | null }) {
-  return (
-    <section id="endstone" className="px-4 py-12">
-      <div className="mx-auto max-w-6xl text-center">
-        <h2 className="text-3xl font-bold">Minecraft Plugins</h2>
-        <div className="mt-8 grid grid-cols-1 gap-5 text-left sm:grid-cols-2 lg:grid-cols-3">
-          {plugins === null && skeleton}
-          {plugins?.length === 0 && (
-            <p className="col-span-full text-center text-neutral-400">
-              No Endstone plugins found yet.
-            </p>
-          )}
-          {plugins?.map((plugin) => (
-            <article
-              key={plugin.repository}
-              className="glass card-hover rounded-lg border border-neutral-800 p-4 shadow sm:p-6"
-            >
-              <h3 className="text-lg font-semibold text-neutral-100">
-                {plugin.name}
-              </h3>
-              <p className="mt-2 text-sm text-neutral-400">
-                {plugin.description}
-              </p>
-              <div className="mt-4 flex flex-wrap gap-2 text-xs text-neutral-400">
-                <span>{plugin.language ?? "Unknown"}</span>
-                <span>{plugin.stars.toLocaleString()} stars</span>
-                <span>{plugin.forks.toLocaleString()} forks</span>
-                {plugin.updated && <span>Updated {plugin.updated}</span>}
-              </div>
-              <div className="mt-4">
-                <a
-                  className="rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm font-semibold text-neutral-100 hover:bg-neutral-700"
-                  href={plugin.repository}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  GitHub
-                </a>
               </div>
             </article>
           ))}

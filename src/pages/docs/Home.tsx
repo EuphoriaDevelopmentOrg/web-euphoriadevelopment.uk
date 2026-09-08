@@ -34,9 +34,9 @@ const categories = [
     "Community",
     [
       ["Web Apps", "/docs/community/web-apps"],
-      ["StreamLink", "/docs/community/streamlink"],
       ["Euphoria Licensing", "/docs/community/euphoria-licensing"],
-      ["Crafatar API", "/docs/community/crafatar-api"],
+      ["Crafatar (moved to NitroCraft)", "/docs/community/crafatar-api"],
+      ["NitroCraft API", "/docs/community/nitrocraft-api"],
       ["NitroCraft Setup", "/docs/community/nitrocraft-setup"],
     ],
   ],

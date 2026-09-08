@@ -1310,7 +1310,6 @@ h3 {
   box-shadow: 0 20px 40px rgb(0 0 0 / 30%);
 }
 .mobile-menu {
-  display: flex;
   position: absolute;
   right: 1rem;
   top: 4rem;

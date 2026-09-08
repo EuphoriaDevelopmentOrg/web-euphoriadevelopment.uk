@@ -10,7 +10,7 @@ export type WebApp = {
   name: string;
   description: string;
   repository: string | null;
-  website: string | null;
+  links: { label: string; href: string }[];
   paid: boolean;
   meta: {
     stars: number;
@@ -20,51 +20,77 @@ export type WebApp = {
   } | null;
 };
 
+export const freePaste = {
+  name: "Euphoria Paste (Free)",
+  description: "Free, open-source paste platform.",
+  repository: "EuphoriaDevelopmentOrg/Euphoria-Paste",
+  links: [
+    {
+      label: "BuiltByBit",
+      href: "https://builtbybit.com/resources/euphoria-paste.57494/?ref=discover",
+    },
+    {
+      label: "SourceXchange",
+      href: "https://www.sourcexchange.net/products/euphoria-paste",
+    },
+  ],
+  paid: false,
+} satisfies Omit<WebApp, "meta">;
+
+export const paidPaste = {
+  name: "Euphoria Paste (Paid)",
+  description: "Paid paste platform.",
+  repository: null,
+  links: [
+    {
+      label: "BuiltByBit",
+      href: "https://builtbybit.com/resources/euphoria-paste.57974/?ref=discover",
+    },
+  ],
+  paid: true,
+} satisfies Omit<WebApp, "meta">;
+
+export const euphoriaLicensing = {
+  name: "Euphoria Licensing",
+  description: "License operations, product validation, and admin management.",
+  repository: null,
+  links: [
+    {
+      label: "Live Demo",
+      href: "https://l-demo.euphoriadevelopment.uk/",
+    },
+    {
+      label: "SourceXchange",
+      href: "https://www.sourcexchange.net/products/euphoria-licensing",
+    },
+    {
+      label: "BuiltByBit",
+      href: "https://builtbybit.com/resources/euphoria-licensing.98263/",
+    },
+  ],
+  paid: true,
+} satisfies Omit<WebApp, "meta">;
+
 const apps = [
-  {
-    name: "Euphoria Paste",
-    description: "Paid paste platform.",
-    repository: "EuphoriaTheme/Euphoria-Paste",
-    website: "https://builtbybit.com/resources/euphoria-paste.57974/",
-    paid: true,
-  },
-  {
-    name: "Euphoria Licensing",
-    description:
-      "License operations, product validation, and admin management.",
-    repository: null,
-    website: "https://builtbybit.com/resources/euphoria-licensing.98263/",
-    paid: true,
-  },
-  {
-    name: "StreamLink",
-    description: "Cross-platform Xbox streaming client scaffold.",
-    repository: "EuphoriaDevelopmentOrg/StreamLink",
-    website: null,
-    paid: false,
-  },
+  freePaste,
+  paidPaste,
+  euphoriaLicensing,
   {
     name: "Crafatar",
-    description: "Minecraft profile assets and renders.",
-    repository: "EuphoriaTheme/crafatar",
-    website: "https://crafatar.euphoriadevelopment.uk/",
+    description:
+      "Crafatar has moved to NitroCraft. Visit NitroCraft for Minecraft profile assets and renders.",
+    repository: null,
+    links: [{ label: "Open NitroCraft", href: "https://nitrocraft.uk" }],
     paid: false,
   },
   {
     name: "NitroCraft",
     description: "High-performance avatar and render delivery.",
     repository: "EuphoriaDevelopmentOrg/NitroCraft",
-    website: "https://nitrocraft.uk",
+    links: [{ label: "Open App", href: "https://nitrocraft.uk" }],
     paid: false,
   },
-  {
-    name: "Eventer",
-    description: "Making scheduling easy.",
-    repository: "RepGraphics/eventer",
-    website: null,
-    paid: false,
-  },
-] as const;
+] satisfies Omit<WebApp, "meta">[];
 
 function formatDate(value: string): string | null {
   const date = new Date(value);

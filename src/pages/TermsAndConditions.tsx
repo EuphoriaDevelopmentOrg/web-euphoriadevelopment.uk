@@ -5,6 +5,7 @@ export function TermsAndConditions() {
   return (
     <LegalPolicyPage
       policy={{
+        theme: "terms",
         kicker: "Legal + Licensing",
         title: "Terms and Conditions",
         summary:
