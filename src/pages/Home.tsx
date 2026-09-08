@@ -27,18 +27,24 @@ import { Link } from "react-router-dom";
 import { fetchContributors, type Contributor } from "../utils/contributors";
 import { fetchDonators, type Donator } from "../utils/donators";
 import {
+  enrichBlueprintProducts,
   fetchBlueprintProducts,
   type BlueprintProduct,
 } from "../utils/products";
 import { fetchSiteStats, type SiteStats } from "../utils/stats";
-import { fetchWebApps, type WebApp } from "../utils/web-apps";
+import {
+  fetchWebApps,
+  initialWebApps,
+  webAppProjectCount,
+  type WebApp,
+} from "../utils/web-apps";
 
 const navigation = [
   ["#statistics", "Statistics", ChartColumn],
-  ["#contributors", "Contributors", Users],
-  ["#donators", "Donators", Heart],
   ["#products", "Blueprints", Puzzle],
   ["#apps", "Web Apps", AppWindow],
+  ["#contributors", "Contributors", Users],
+  ["#donators", "Donators", Heart],
 ] as const;
 const skeleton = (
   <div className="glass shimmer h-40 rounded-lg border border-neutral-800" />
@@ -50,7 +56,10 @@ export function Home() {
   const [donators, setDonators] = useState<Donator[] | null>(null);
   const [stats, setStats] = useState<SiteStats | null>(null);
   const [products, setProducts] = useState<BlueprintProduct[] | null>(null);
-  const [webApps, setWebApps] = useState<WebApp[] | null>(null);
+  const [webApps, setWebApps] = useState<WebApp[]>(initialWebApps);
+  const [statsLoading, setStatsLoading] = useState(true);
+  const [productsError, setProductsError] = useState(false);
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     document.body.classList.add(
@@ -64,16 +73,12 @@ export function Home() {
     void fetchDonators()
       .then(setDonators)
       .catch(() => setDonators([]));
-    void fetchSiteStats()
-      .then(setStats)
-      .catch(() => setStats(null));
-    void fetchBlueprintProducts()
-      .then(setProducts)
-      .catch(() => setProducts([]));
-    void fetchWebApps()
-      .then(setWebApps)
-      .catch(() => setWebApps([]));
+    let active = true;
+    void fetchWebApps().then((apps) => {
+      if (active) setWebApps(apps);
+    });
     return () => {
+      active = false;
       document.body.classList.remove(
         "min-h-screen",
         "bg-neutral-950",
@@ -81,6 +86,39 @@ export function Home() {
       );
     };
   }, []);
+
+  useEffect(() => {
+    let active = true;
+    void fetchSiteStats()
+      .then((data) => {
+        if (active) setStats(data);
+      })
+      .catch(() => {
+        if (active) setStats(null);
+      })
+      .finally(() => {
+        if (active) setStatsLoading(false);
+      });
+    void fetchBlueprintProducts()
+      .then(async (catalogue) => {
+        if (!active) return;
+        setProducts(catalogue);
+        const enriched = await enrichBlueprintProducts(catalogue);
+        if (active) setProducts(enriched);
+      })
+      .catch(() => {
+        if (active) setProductsError(true);
+      });
+    return () => {
+      active = false;
+    };
+  }, [attempt]);
+
+  function retryCatalogue() {
+    setProductsError(false);
+    setStatsLoading(true);
+    setAttempt((value) => value + 1);
+  }
 
   return (
     <>
@@ -182,7 +220,17 @@ export function Home() {
             </a>
           </div>
         </section>
-        <Stats stats={stats} />
+        <Stats
+          stats={stats}
+          loading={statsLoading}
+          projectCount={products ? products.length + webAppProjectCount : null}
+        />
+        <Products
+          products={products}
+          error={productsError}
+          onRetry={retryCatalogue}
+        />
+        <WebApps apps={webApps} />
         <PeopleSection
           id="contributors"
           title="Contributors"
@@ -197,8 +245,6 @@ export function Home() {
           kind="donator"
         />
         <GetInvolved />
-        <Products products={products} />
-        <WebApps apps={webApps} />
         <footer className="glass mt-4 border-t border-neutral-800 px-4 py-8 text-center text-neutral-400">
           <p>© 2026 Euphoria Development. All rights reserved.</p>
           <div className="mt-3 flex justify-center gap-3 text-sm">
@@ -212,22 +258,36 @@ export function Home() {
   );
 }
 
-function Stats({ stats }: { stats: SiteStats | null }) {
+function Stats({
+  stats,
+  loading,
+  projectCount,
+}: {
+  stats: SiteStats | null;
+  loading: boolean;
+  projectCount: number | null;
+}) {
+  const display = (value: number | null | undefined) =>
+    value ?? (loading ? "Loading…" : "Unavailable");
   return (
     <section
       id="statistics"
       className="glass-light border-y border-neutral-800 px-4 py-12"
     >
       <div className="mx-auto grid max-w-6xl gap-5 sm:grid-cols-3">
-        <Stat label="Total Projects" value={9} icon={Boxes} />
+        <Stat
+          label="Total Projects"
+          value={display(projectCount)}
+          icon={Boxes}
+        />
         <Stat
           label="API Calls"
-          value={stats ? stats.totalApiCalls : 12727}
+          value={display(stats?.totalApiCalls)}
           icon={Activity}
         />
         <Stat
           label="Active Panels"
-          value={stats ? stats.totalInstalls : 1275}
+          value={display(stats?.totalInstalls)}
           icon={Server}
         />
       </div>
@@ -240,7 +300,7 @@ function Stat({
   icon: Icon,
 }: {
   label: string;
-  value: number;
+  value: number | string;
   icon: LucideIcon;
 }) {
   return (
@@ -426,52 +486,78 @@ function Action({
     </a>
   );
 }
-function Products({ products }: { products: BlueprintProduct[] | null }) {
+function Products({
+  products,
+  error,
+  onRetry,
+}: {
+  products: BlueprintProduct[] | null;
+  error: boolean;
+  onRetry: () => void;
+}) {
   const addons = products?.filter((product) => product.type === "addon") ?? [];
   const themes = products?.filter((product) => product.type === "theme") ?? [];
   return (
     <section id="products" className="px-4 py-12">
       <div className="mx-auto max-w-6xl">
         <SectionTitle title="Blueprints" icon={Puzzle} />
-        <div className="mt-10">
-          <h3 className="flex items-center gap-2 text-xl font-semibold">
-            <Puzzle
-              aria-hidden="true"
-              className="size-5 shrink-0 text-blue-400"
-            />
-            Blueprint Addons{" "}
-            <span className="text-base font-normal text-neutral-400">
-              ({products === null ? "…" : addons.length})
-            </span>
-          </h3>
-          <ProductGrid
-            products={addons}
-            loading={products === null}
-            emptyMessage="No Blueprint addons found yet."
-          />
-        </div>
-        <div className="mt-10">
-          <h3 className="flex items-center gap-2 text-xl font-semibold">
-            <Palette
-              aria-hidden="true"
-              className="size-5 shrink-0 text-blue-400"
-            />
-            Blueprint Themes{" "}
-            <span className="text-base font-normal text-neutral-400">
-              ({products === null ? "…" : themes.length})
-            </span>
-          </h3>
-          <ProductGrid
-            products={themes}
-            loading={products === null}
-            emptyMessage="No Blueprint themes found yet."
-          />
-        </div>
-        {products && (
-          <p className="mt-6 text-center text-sm text-neutral-400">
-            Showing {products.length} Blueprints | {addons.length} addons |{" "}
-            {themes.length} themes
-          </p>
+        {error ? (
+          <div className="mt-8 text-center" role="status">
+            <p className="text-neutral-400">
+              The Blueprint catalogue is unavailable right now. Please try
+              again.
+            </p>
+            <button
+              type="button"
+              className="mt-4 rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-500"
+              onClick={onRetry}
+            >
+              Retry catalogue
+            </button>
+          </div>
+        ) : (
+          <>
+            <div className="mt-10">
+              <h3 className="flex items-center gap-2 text-xl font-semibold">
+                <Puzzle
+                  aria-hidden="true"
+                  className="size-5 shrink-0 text-blue-400"
+                />
+                Blueprint Addons{" "}
+                <span className="text-base font-normal text-neutral-400">
+                  ({products === null ? "…" : addons.length})
+                </span>
+              </h3>
+              <ProductGrid
+                products={addons}
+                loading={products === null}
+                emptyMessage="No Blueprint addons found yet."
+              />
+            </div>
+            <div className="mt-10">
+              <h3 className="flex items-center gap-2 text-xl font-semibold">
+                <Palette
+                  aria-hidden="true"
+                  className="size-5 shrink-0 text-blue-400"
+                />
+                Blueprint Themes{" "}
+                <span className="text-base font-normal text-neutral-400">
+                  ({products === null ? "…" : themes.length})
+                </span>
+              </h3>
+              <ProductGrid
+                products={themes}
+                loading={products === null}
+                emptyMessage="No Blueprint themes found yet."
+              />
+            </div>
+            {products && (
+              <p className="mt-6 text-center text-sm text-neutral-400">
+                Showing {products.length} Blueprints | {addons.length} addons |{" "}
+                {themes.length} themes
+              </p>
+            )}
+          </>
         )}
       </div>
     </section>

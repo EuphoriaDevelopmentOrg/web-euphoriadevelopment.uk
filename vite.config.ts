@@ -1,10 +1,10 @@
 import react from "@vitejs/plugin-react";
-import { vitePages } from "@kingironman2011/vite-pages";
+import { sitePageAssets } from "./build/site-pages.ts";
 import { defineConfig } from "vite";
 
 export default defineConfig({
   base: "/",
-  plugins: [react(), vitePages()],
+  plugins: [react(), sitePageAssets()],
   server: {
     host: true,
     port: 5173,

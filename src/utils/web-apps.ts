@@ -12,6 +12,7 @@ export type WebApp = {
   repository: string | null;
   links: { label: string; href: string }[];
   paid: boolean;
+  status?: "moved";
   meta: {
     stars: number;
     forks: number;
@@ -25,6 +26,10 @@ export const freePaste = {
   description: "Free, open-source paste platform.",
   repository: "EuphoriaDevelopmentOrg/Euphoria-Paste",
   links: [
+    {
+      label: "Live Demo",
+      href: "https://paste.euphoriadevelopment.uk/",
+    },
     {
       label: "BuiltByBit",
       href: "https://builtbybit.com/resources/euphoria-paste.57494/?ref=discover",
@@ -42,6 +47,10 @@ export const paidPaste = {
   description: "Paid paste platform.",
   repository: null,
   links: [
+    {
+      label: "Live Demo",
+      href: "https://paste-v2.euphoriadevelopment.uk/",
+    },
     {
       label: "BuiltByBit",
       href: "https://builtbybit.com/resources/euphoria-paste.57974/?ref=discover",
@@ -71,12 +80,13 @@ export const euphoriaLicensing = {
   paid: true,
 } satisfies Omit<WebApp, "meta">;
 
-const apps = [
+const apps: Omit<WebApp, "meta">[] = [
   freePaste,
   paidPaste,
   euphoriaLicensing,
   {
     name: "Crafatar",
+    status: "moved",
     description:
       "Crafatar has moved to NitroCraft. Visit NitroCraft for Minecraft profile assets and renders.",
     repository: null,
@@ -90,7 +100,16 @@ const apps = [
     links: [{ label: "Open App", href: "https://nitrocraft.uk" }],
     paid: false,
   },
-] satisfies Omit<WebApp, "meta">[];
+];
+
+export const initialWebApps: WebApp[] = apps.map((app) => ({
+  ...app,
+  meta: null,
+}));
+// Count the listed editions, excluding the legacy Crafatar migration card.
+export const webAppProjectCount = apps.filter(
+  (app) => app.status !== "moved",
+).length;
 
 function formatDate(value: string): string | null {
   const date = new Date(value);
@@ -110,7 +129,7 @@ export async function fetchWebApps(): Promise<WebApp[]> {
       try {
         const { data } = await axios.get<GithubRepository>(
           `https://api.github.com/repos/${app.repository}`,
-          { headers: { Accept: "application/vnd.github+json" } },
+          { timeout: 5000, headers: { Accept: "application/vnd.github+json" } },
         );
         return {
           stars: data.stargazers_count ?? 0,
