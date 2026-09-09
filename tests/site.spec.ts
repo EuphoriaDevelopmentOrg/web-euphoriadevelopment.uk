@@ -35,6 +35,15 @@ const catalogue = {
   ],
 };
 
+const team = [
+  {
+    Name: "Example Team Member",
+    Image: "https://example.com/team-member.png",
+    Link: "https://example.com/team-member",
+    Role: "Developer",
+  },
+];
+
 test.beforeEach(async ({ page }) => {
   // External services cannot make these tests flaky or require credentials.
   await page.route(/^https?:\/\//, async (route) => {
@@ -42,7 +51,11 @@ test.beforeEach(async ({ page }) => {
     if (url.hostname === "127.0.0.1") return route.continue();
     if (url.hostname === "api.euphoriadevelopment.uk") {
       return route.fulfill({
-        json: url.pathname.startsWith("/stats") ? catalogue : [],
+        json: url.pathname.startsWith("/stats")
+          ? catalogue
+          : url.pathname === "/team"
+            ? team
+            : [],
       });
     }
     if (url.hostname === "api.github.com")
@@ -109,9 +122,22 @@ test("catalogue and demos appear before GitHub responds; counts use API data", a
     expect(sections.indexOf("products")).toBeLessThan(
       sections.indexOf("contributors"),
     );
-    expect(sections.indexOf("apps")).toBeLessThan(
+    expect(sections.indexOf("apps")).toBeLessThan(sections.indexOf("team"));
+    expect(sections.indexOf("team")).toBeLessThan(
       sections.indexOf("contributors"),
     );
+    const teamCard = page.locator("#team").filter({
+      has: page.getByRole("heading", {
+        name: "Example Team Member",
+        exact: true,
+      }),
+    });
+    await expect(
+      teamCard.getByText("Developer", { exact: true }),
+    ).toBeVisible();
+    await expect(
+      teamCard.getByRole("link", { name: /Example Team Member/ }),
+    ).toHaveAttribute("href", "https://example.com/team-member");
     await expectNoOverflow(page);
   } finally {
     releaseGithub();

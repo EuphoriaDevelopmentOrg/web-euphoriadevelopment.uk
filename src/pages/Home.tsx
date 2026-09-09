@@ -32,6 +32,7 @@ import {
   type BlueprintProduct,
 } from "../utils/products";
 import { fetchSiteStats, type SiteStats } from "../utils/stats";
+import { fetchTeam, type TeamMember } from "../utils/team";
 import {
   fetchWebApps,
   initialWebApps,
@@ -43,6 +44,7 @@ const navigation = [
   ["#statistics", "Statistics", ChartColumn],
   ["#products", "Blueprints", Puzzle],
   ["#apps", "Web Apps", AppWindow],
+  ["#team", "Team", Users],
   ["#contributors", "Contributors", Users],
   ["#donators", "Donators", Heart],
 ] as const;
@@ -53,6 +55,7 @@ const skeleton = (
 export function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [contributors, setContributors] = useState<Contributor[] | null>(null);
+  const [team, setTeam] = useState<TeamMember[] | null>(null);
   const [donators, setDonators] = useState<Donator[] | null>(null);
   const [stats, setStats] = useState<SiteStats | null>(null);
   const [products, setProducts] = useState<BlueprintProduct[] | null>(null);
@@ -70,6 +73,9 @@ export function Home() {
     void fetchContributors()
       .then(setContributors)
       .catch(() => setContributors([]));
+    void fetchTeam()
+      .then(setTeam)
+      .catch(() => setTeam([]));
     void fetchDonators()
       .then(setDonators)
       .catch(() => setDonators([]));
@@ -232,6 +238,13 @@ export function Home() {
         />
         <WebApps apps={webApps} />
         <PeopleSection
+          id="team"
+          title="Team"
+          people={team}
+          kind="team"
+          className="bg-neutral-900"
+        />
+        <PeopleSection
           id="contributors"
           title="Contributors"
           people={contributors}
@@ -338,17 +351,14 @@ function PeopleSection({
 }: {
   id: string;
   title: string;
-  people: (Contributor | Donator)[] | null;
-  kind: "contributor" | "donator";
+  people: (Contributor | Donator | TeamMember)[] | null;
+  kind: "contributor" | "donator" | "team";
   className?: string;
 }) {
   return (
     <section id={id} className={`px-4 py-12 ${className}`}>
       <div className="mx-auto max-w-6xl text-center">
-        <SectionTitle
-          title={title}
-          icon={kind === "contributor" ? Users : Heart}
-        />
+        <SectionTitle title={title} icon={kind === "donator" ? Heart : Users} />
         <div className="mt-8 grid grid-cols-1 gap-5 text-left sm:grid-cols-2 lg:grid-cols-3">
           {people === null && skeleton}
           {people?.length === 0 && (
@@ -372,8 +382,8 @@ function PersonCard({
   person,
   kind,
 }: {
-  person: Contributor | Donator;
-  kind: "contributor" | "donator";
+  person: Contributor | Donator | TeamMember;
+  kind: "contributor" | "donator" | "team";
 }) {
   const avatar =
     person.image ??
@@ -396,13 +406,17 @@ function PersonCard({
             <span className="shrink-0 rounded-full border border-blue-500/20 bg-blue-500/15 px-2 py-1 text-xs text-blue-300">
               {kind === "contributor"
                 ? "Contributor"
-                : (person as Donator).donation || "Supporter"}
+                : kind === "team"
+                  ? (person as TeamMember).role || "Team"
+                  : (person as Donator).donation || "Supporter"}
             </span>
           </div>
           <p className="mt-1 text-sm text-neutral-400">
             {kind === "contributor"
               ? (person as Contributor).contribution || "Contributor"
-              : "Thank you for supporting Euphoria Development."}
+              : kind === "team"
+                ? "Euphoria Development team member."
+                : "Thank you for supporting Euphoria Development."}
           </p>
         </div>
       </div>
