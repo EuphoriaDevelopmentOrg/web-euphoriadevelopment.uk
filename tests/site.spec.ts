@@ -133,6 +133,9 @@ test("catalogue and demos appear before GitHub responds; counts use API data", a
       }),
     });
     await expect(
+      teamCard.getByText("Team Member", { exact: true }),
+    ).toBeVisible();
+    await expect(
       teamCard.getByText("Developer", { exact: true }),
     ).toBeVisible();
     await expect(

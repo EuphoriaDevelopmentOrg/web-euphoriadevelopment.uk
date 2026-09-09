@@ -407,7 +407,7 @@ function PersonCard({
               {kind === "contributor"
                 ? "Contributor"
                 : kind === "team"
-                  ? (person as TeamMember).role || "Team"
+                  ? "Team Member"
                   : (person as Donator).donation || "Supporter"}
             </span>
           </div>
@@ -415,7 +415,7 @@ function PersonCard({
             {kind === "contributor"
               ? (person as Contributor).contribution || "Contributor"
               : kind === "team"
-                ? "Euphoria Development team member."
+                ? (person as TeamMember).role || "Team Member"
                 : "Thank you for supporting Euphoria Development."}
           </p>
         </div>
