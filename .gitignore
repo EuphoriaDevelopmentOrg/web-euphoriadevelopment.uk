@@ -1,6 +1,7 @@
 node_modules/
 .pnpm-store/
-dist/
+.next/
 playwright-report/
 test-results/
-src/vite-env.d.ts
+next-env.d.ts
+tsconfig.tsbuildinfo

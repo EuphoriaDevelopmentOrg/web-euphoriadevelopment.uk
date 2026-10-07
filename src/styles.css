@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@source "./utils";
 
 :root {
   --docs-bg: #050b16;
@@ -29,11 +28,7 @@ body.docs-page {
   flex-direction: column;
   color: var(--docs-text);
   font-family:
-    "IBM Plex Sans",
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    "Segoe UI",
+    "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
     sans-serif;
   line-height: 1.55;
   background:
@@ -198,11 +193,7 @@ a {
   margin: 0.35rem 0 0;
   color: var(--docs-title);
   font-family:
-    "Space Grotesk",
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    "Segoe UI",
+    "Space Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
     sans-serif;
   letter-spacing: -0.02em;
   font-size: clamp(1.9rem, 5vw, 3rem);
@@ -277,11 +268,7 @@ a {
   margin: 0;
   color: var(--docs-title);
   font-family:
-    "Space Grotesk",
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    "Segoe UI",
+    "Space Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
     sans-serif;
   font-size: 1.05rem;
 }
@@ -341,11 +328,7 @@ a {
   margin: 0;
   color: var(--docs-title);
   font-family:
-    "Space Grotesk",
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    "Segoe UI",
+    "Space Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
     sans-serif;
   font-size: clamp(1.05rem, 2.25vw, 1.4rem);
   letter-spacing: -0.018em;
@@ -362,11 +345,7 @@ a {
   margin: 0.78rem 0 0;
   color: var(--docs-title);
   font-family:
-    "Space Grotesk",
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    "Segoe UI",
+    "Space Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
     sans-serif;
   font-size: 0.98rem;
   letter-spacing: -0.01em;
@@ -452,11 +431,7 @@ a {
   color: var(--docs-title);
   font-size: 1rem;
   font-family:
-    "Space Grotesk",
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    "Segoe UI",
+    "Space Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
     sans-serif;
 }
 
@@ -798,11 +773,7 @@ body.legal-page {
     ),
     linear-gradient(180deg, #020617 0%, #030816 38%, #05070f 100%);
   font-family:
-    "IBM Plex Sans",
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    "Segoe UI",
+    "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
     sans-serif;
   line-height: 1.55;
 }
@@ -951,11 +922,7 @@ a {
   margin: 0.32rem 0 0;
   color: var(--lp-title);
   font-family:
-    "Space Grotesk",
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    "Segoe UI",
+    "Space Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
     sans-serif;
   letter-spacing: -0.02em;
   font-size: clamp(1.95rem, 4.8vw, 3.1rem);
@@ -1006,11 +973,7 @@ a {
   margin: 0;
   color: var(--lp-title);
   font-family:
-    "Space Grotesk",
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    "Segoe UI",
+    "Space Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
     sans-serif;
   letter-spacing: -0.015em;
   font-size: 1.04rem;
@@ -1082,11 +1045,7 @@ a {
   margin: 0;
   color: var(--lp-title);
   font-family:
-    "Space Grotesk",
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    "Segoe UI",
+    "Space Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
     sans-serif;
   letter-spacing: -0.02em;
   font-size: clamp(1.06rem, 2.25vw, 1.44rem);
@@ -1139,11 +1098,7 @@ a {
   margin: 0;
   color: var(--lp-title);
   font-family:
-    "Space Grotesk",
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    "Segoe UI",
+    "Space Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
     sans-serif;
   letter-spacing: -0.015em;
   font-size: 1.14rem;

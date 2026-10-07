@@ -1,5 +1,7 @@
+"use client";
+
 import { useEffect, type CSSProperties, type ReactNode } from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 type Section = { id: string; title: string; content: ReactNode | string[] };
 type Policy = {
@@ -33,16 +35,16 @@ export function LegalPolicyPage({ policy }: { policy: Policy }) {
     <>
       <header className="site-header">
         <div className="site-header-inner">
-          <Link to="/" className="brand">
+          <Link href="/" className="brand">
             <img src="/images/euphoria.png" alt="Euphoria Development logo" />
             <span>Euphoria Development</span>
           </Link>
           <nav className="quick-links" aria-label="Legal navigation">
-            <Link to="/">Home</Link>
+            <Link href="/">Home</Link>
             {legalLinks.map(([href, label]) => (
               <Link
                 key={href}
-                to={href}
+                href={href}
                 className={
                   policy.title.startsWith(label.slice(0, -1)) ||
                   policy.title.startsWith(label)
@@ -123,7 +125,7 @@ export function LegalPolicyPage({ policy }: { policy: Policy }) {
           <span>© 2026 Euphoria Development</span>
           <nav aria-label="Legal">
             {legalLinks.map(([href, label]) => (
-              <Link key={href} to={href}>
+              <Link key={href} href={href}>
                 {label} Policy
               </Link>
             ))}

@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 export function CrafatarMigrationNotice() {
   return (
@@ -20,10 +20,10 @@ export function CrafatarMigrationNotice() {
         >
           Open NitroCraft
         </a>
-        <Link className="text-link" to="/docs/community/nitrocraft-api">
+        <Link className="text-link" href="/docs/community/nitrocraft-api">
           NitroCraft API Docs
         </Link>
-        <Link className="text-link" to="/docs/community/nitrocraft-setup">
+        <Link className="text-link" href="/docs/community/nitrocraft-setup">
           NitroCraft Setup Guide
         </Link>
       </div>
