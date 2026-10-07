@@ -3,6 +3,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import Link from "fumadocs-core/link";
+import { ArrowRight, ExternalLink, GitFork, Star } from "lucide-react";
 import { euphoriaLicensing, freePaste, paidPaste } from "@/utils/web-apps";
 
 type RepoMeta = { forks: number; stars: number; language: string | null };
@@ -54,10 +55,12 @@ export function WebApps() {
     if (repository === null) return <span>Metadata unavailable right now</span>;
     return (
       <>
-        <span>
+        <span className="inline-flex items-center gap-1">
+          <GitFork className="size-3 shrink-0" aria-hidden="true" />
           Forks: {repository ? repository.forks.toLocaleString() : "…"}
         </span>
-        <span>
+        <span className="inline-flex items-center gap-1">
+          <Star className="size-3 shrink-0" aria-hidden="true" />
           Stars: {repository ? repository.stars.toLocaleString() : "…"}
         </span>
         <span>Language: {repository?.language ?? "…"}</span>
@@ -100,12 +103,13 @@ export function WebApps() {
             {paidPaste.links.map(({ label, href }) => (
               <a
                 key={href}
-                className="text-fd-primary font-medium hover:underline"
+                className="text-fd-primary hover:text-fd-primary/80 inline-flex items-center gap-1 font-medium hover:underline"
                 href={href}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {label} ↗
+                {label}
+                <ExternalLink className="size-3.5" aria-hidden="true" />
               </a>
             ))}
           </div>
@@ -130,22 +134,24 @@ export function WebApps() {
           </p>
           <div className="border-fd-border mt-4 flex flex-wrap gap-3 border-t pt-3 text-sm">
             <a
-              className="text-fd-primary font-medium hover:underline"
+              className="text-fd-primary hover:text-fd-primary/80 inline-flex items-center gap-1 font-medium hover:underline"
               href={`https://github.com/${freePaste.repository}`}
               target="_blank"
               rel="noopener noreferrer"
             >
-              View on GitHub ↗
+              View on GitHub
+              <ExternalLink className="size-3.5" aria-hidden="true" />
             </a>
             {freePaste.links.map(({ label, href }) => (
               <a
                 key={href}
-                className="text-fd-primary font-medium hover:underline"
+                className="text-fd-primary hover:text-fd-primary/80 inline-flex items-center gap-1 font-medium hover:underline"
                 href={href}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {label} ↗
+                {label}
+                <ExternalLink className="size-3.5" aria-hidden="true" />
               </a>
             ))}
           </div>
@@ -173,19 +179,21 @@ export function WebApps() {
             {euphoriaLicensing.links.map(({ label, href }) => (
               <a
                 key={href}
-                className="text-fd-primary font-medium hover:underline"
+                className="text-fd-primary hover:text-fd-primary/80 inline-flex items-center gap-1 font-medium hover:underline"
                 href={href}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {label} ↗
+                {label}
+                <ExternalLink className="size-3.5" aria-hidden="true" />
               </a>
             ))}
             <Link
-              className="text-fd-primary font-medium hover:underline"
+              className="text-fd-primary hover:text-fd-primary/80 inline-flex items-center gap-1 font-medium hover:underline"
               href="/docs/community/euphoria-licensing"
             >
-              Deployment Docs →
+              Deployment Docs
+              <ArrowRight className="size-3.5" aria-hidden="true" />
             </Link>
           </div>
         </div>
@@ -205,24 +213,27 @@ export function WebApps() {
           </p>
           <div className="border-fd-border mt-4 flex flex-wrap gap-3 border-t pt-3 text-sm">
             <a
-              className="text-fd-primary font-medium hover:underline"
+              className="text-fd-primary hover:text-fd-primary/80 inline-flex items-center gap-1 font-medium hover:underline"
               href="https://nitrocraft.uk"
               target="_blank"
               rel="noopener noreferrer"
             >
-              Open NitroCraft ↗
+              Open NitroCraft
+              <ExternalLink className="size-3.5" aria-hidden="true" />
             </a>
             <Link
-              className="text-fd-primary font-medium hover:underline"
+              className="text-fd-primary hover:text-fd-primary/80 inline-flex items-center gap-1 font-medium hover:underline"
               href="/docs/community/nitrocraft-api"
             >
-              NitroCraft API Docs →
+              NitroCraft API Docs
+              <ArrowRight className="size-3.5" aria-hidden="true" />
             </Link>
             <Link
-              className="text-fd-primary font-medium hover:underline"
+              className="text-fd-primary hover:text-fd-primary/80 inline-flex items-center gap-1 font-medium hover:underline"
               href="/docs/community/nitrocraft-setup"
             >
-              NitroCraft Setup Guide →
+              NitroCraft Setup Guide
+              <ArrowRight className="size-3.5" aria-hidden="true" />
             </Link>
           </div>
         </div>
@@ -240,32 +251,36 @@ export function WebApps() {
           </p>
           <div className="border-fd-border mt-4 flex flex-wrap gap-3 border-t pt-3 text-sm">
             <a
-              className="text-fd-primary font-medium hover:underline"
+              className="text-fd-primary hover:text-fd-primary/80 inline-flex items-center gap-1 font-medium hover:underline"
               href="https://github.com/EuphoriaDevelopmentOrg/NitroCraft"
               target="_blank"
               rel="noopener noreferrer"
             >
-              View on GitHub ↗
+              View on GitHub
+              <ExternalLink className="size-3.5" aria-hidden="true" />
             </a>
             <a
-              className="text-fd-primary font-medium hover:underline"
+              className="text-fd-primary hover:text-fd-primary/80 inline-flex items-center gap-1 font-medium hover:underline"
               href="https://github.com/EuphoriaDevelopmentOrg/NitroCraft/releases"
               target="_blank"
               rel="noopener noreferrer"
             >
-              Releases ↗
+              Releases
+              <ExternalLink className="size-3.5" aria-hidden="true" />
             </a>
             <Link
-              className="text-fd-primary font-medium hover:underline"
+              className="text-fd-primary hover:text-fd-primary/80 inline-flex items-center gap-1 font-medium hover:underline"
               href="/docs/community/nitrocraft-api"
             >
-              API Docs →
+              API Docs
+              <ArrowRight className="size-3.5" aria-hidden="true" />
             </Link>
             <Link
-              className="text-fd-primary font-medium hover:underline"
+              className="text-fd-primary hover:text-fd-primary/80 inline-flex items-center gap-1 font-medium hover:underline"
               href="/docs/community/nitrocraft-setup"
             >
-              Setup Guide →
+              Setup Guide
+              <ArrowRight className="size-3.5" aria-hidden="true" />
             </Link>
           </div>
         </div>

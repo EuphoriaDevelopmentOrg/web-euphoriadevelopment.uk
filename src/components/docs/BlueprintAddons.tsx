@@ -2,6 +2,7 @@
 
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { ExternalLink, GitFork, Star } from "lucide-react";
 
 type Repository = {
   name: string;
@@ -99,13 +100,16 @@ export function BlueprintAddons() {
                 <span className="bg-fd-secondary rounded-md px-2 py-0.5">
                   {repository.language ?? "Unknown"}
                 </span>
-                <span className="bg-fd-secondary rounded-md px-2 py-0.5">
+                <span className="bg-fd-secondary inline-flex items-center gap-1 rounded-md px-2 py-0.5">
+                  <Star className="size-3 shrink-0" aria-hidden="true" />
                   {repository.stargazers_count?.toLocaleString() ??
                     "Unavailable"}{" "}
                   stars
                 </span>
-                <span className="bg-fd-secondary rounded-md px-2 py-0.5">
-                  {repository.forks_count?.toLocaleString() ?? "Unavailable"}{" "}
+                <span className="bg-fd-secondary inline-flex items-center gap-1 rounded-md px-2 py-0.5">
+                  <GitFork className="size-3 shrink-0" aria-hidden="true" />
+                  {repository.forks_count?.toLocaleString() ??
+                    "Unavailable"}{" "}
                   forks
                 </span>
               </div>
@@ -117,20 +121,22 @@ export function BlueprintAddons() {
             </div>
             <div className="border-fd-border mt-4 flex gap-3 border-t pt-3 text-sm">
               <a
-                className="text-fd-primary font-medium hover:underline"
+                className="text-fd-primary hover:text-fd-primary/80 inline-flex items-center gap-1 font-medium hover:underline"
                 href={repository.html_url}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Repository ↗
+                Repository
+                <ExternalLink className="size-3.5" aria-hidden="true" />
               </a>
               <a
-                className="text-fd-primary font-medium hover:underline"
+                className="text-fd-primary hover:text-fd-primary/80 inline-flex items-center gap-1 font-medium hover:underline"
                 href={`${repository.html_url}/releases`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Releases ↗
+                Releases
+                <ExternalLink className="size-3.5" aria-hidden="true" />
               </a>
             </div>
           </div>

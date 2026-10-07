@@ -31,11 +31,6 @@ export default function RootDocsLayout({
           { text: "Home", url: "/docs", active: "url" },
           { text: "Main Site", url: "/" },
           {
-            text: "Original GitBook",
-            url: "https://euphoria-development.gitbook.io/euphoria-development",
-            external: true,
-          },
-          {
             text: "Support Discord",
             url: "https://discord.euphoriadevelopment.uk",
             external: true,

@@ -285,6 +285,31 @@ test("shared docs navigation preserves theme and updates metadata without reload
   await expect(page).toHaveTitle(pageTitle(sitePages[0]));
 });
 
+test("docs supports light and dark themes with matching background styling", async ({
+  page,
+}) => {
+  await page.goto("/docs");
+  await page.evaluate(() => {
+    localStorage.setItem("theme", "light");
+    document.documentElement.classList.remove("dark");
+    document.documentElement.classList.add("light");
+  });
+  const lightBg = await page.evaluate(
+    () => window.getComputedStyle(document.body).backgroundImage,
+  );
+  expect(lightBg).toContain("248, 250, 252");
+
+  await page.evaluate(() => {
+    localStorage.setItem("theme", "dark");
+    document.documentElement.classList.remove("light");
+    document.documentElement.classList.add("dark");
+  });
+  const darkBg = await page.evaluate(
+    () => window.getComputedStyle(document.body).backgroundImage,
+  );
+  expect(darkBg).toContain("2, 6, 23");
+});
+
 for (const sitePage of sitePages.filter((page) => page.path !== "/")) {
   test(`direct route renders its content, theme, and metadata: ${sitePage.path}`, async ({
     page,
