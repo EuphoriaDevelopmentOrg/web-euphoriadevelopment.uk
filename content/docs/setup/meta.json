@@ -1,0 +1,11 @@
+{
+  "title": "Setup",
+  "pages": [
+    "player-listing",
+    "refresh-theme",
+    "mc-logs",
+    "server-backgrounds",
+    "translations",
+    "resource-alerts"
+  ]
+}

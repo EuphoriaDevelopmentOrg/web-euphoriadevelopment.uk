@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import "fumadocs-ui/css/preset.css";
+@import "fumadocs-ui/css/ocean.css";
 
 :root {
   --docs-bg: #050b16;

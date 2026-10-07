@@ -1,0 +1,79 @@
+---
+title: NitroCraft API
+description: Use the NitroCraft API to deliver Minecraft avatars, skins, capes, and renders.
+---
+
+import { Callout } from "fumadocs-ui/components/callout";
+
+## API Overview
+
+**NitroCraft** is a full from-scratch remake built on Nitro and `minecraft-toolkit`, focused on performance and reliability.
+
+Hosted base URL: `https://nitrocraft.uk`
+
+<Callout>
+  Interactive OpenAPI docs are at `/docs`; metrics are at `/metrics`.
+</Callout>
+
+[Open NitroCraft](https://nitrocraft.uk) · [Source Repository](https://github.com/EuphoriaDevelopmentOrg/NitroCraft)
+
+## Avatar, Skin, and Renders
+
+- `GET /avatars/{uuid}?size=160&overlay`
+- `GET /skins/{uuid}`
+- `GET /capes/{uuid}`
+- `GET /renders/head/{uuid}?scale=6&overlay`
+- `GET /renders/body/{uuid}?scale=6&overlay`
+
+```bash
+GET https://nitrocraft.uk/avatars/d634462bd663401d9788a8596307bc4d?size=100&overlay
+GET https://nitrocraft.uk/renders/head/d634462bd663401d9788a8596307bc4d?scale=6&overlay
+GET https://nitrocraft.uk/renders/body/d634462bd663401d9788a8596307bc4d?scale=6&overlay
+```
+
+## Player Lookup
+
+Player routes accept a UUID or username and return profile-related data.
+
+- `GET /players/{uuid-or-username}`
+- `GET /players/{uuid-or-username}/profile`
+- `GET /players/{uuid-or-username}/history`
+- `GET /players/{uuid-or-username}/skin-metadata`
+
+## Server Status Endpoints
+
+- `GET /status/mc`
+- `GET /status/java?address=host`
+- `GET /status/bedrock?address=host`
+- `GET /status/server?address=host&edition=auto`
+- `GET /status/browser?address=hostA&address=hostB`
+- `GET /status/browser?source=my-directory&source=another-directory`
+- `GET /status/icon?address=host`
+
+<Callout>
+  `/status/browser` supports multi-target checks with concurrency limits and
+  optional source-feed ingestion.
+</Callout>
+
+## Text and Tooling
+
+### Formatting
+
+- `GET /format/html?text=...`
+- `GET /format/strip?text=...`
+- `GET /format/css`
+
+### Tools and Meta
+
+- `GET /tools/server-list`
+- `GET /tools/server-browser`
+- `GET /docs`
+- `GET /metrics`
+
+## Common Configuration Impacting API
+
+- `SESSIONS_RATE_LIMIT` controls outbound Mojang session request rate.
+- `REQUESTS_RATE_LIMIT` and related settings control inbound per-IP limiting.
+- `STATUS_ALLOW_PRIVATE_TARGETS` controls private or local target probing.
+- `DEFAULT_REDIRECT_ALLOWLIST` controls hosts allowed by `default=` redirects.
+- `CORS_ORIGIN` controls allowed browser origins.

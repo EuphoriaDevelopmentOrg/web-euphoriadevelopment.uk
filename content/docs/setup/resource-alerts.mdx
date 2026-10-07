@@ -1,0 +1,23 @@
+---
+title: Resource Alerts
+description: Configure resource usage alerts for servers in your Pterodactyl Panel.
+---
+
+import { Callout } from "fumadocs-ui/components/callout";
+
+## Alert Configuration
+
+1. Open Blueprint Extensions and select **Resource Alerts**.
+2. Set CPU, memory, and disk alert thresholds.
+3. Configure an action-button URL for incident response.
+
+![Resource alerts setup example](/images/docs/gitbook-008.png)
+
+## Tuning Strategy
+
+Start with broader thresholds to prevent noisy alerts, then tighten them as real load patterns become clear.
+
+<Callout>
+  Too-aggressive limits can create alert fatigue and reduce response quality
+  during real incidents.
+</Callout>

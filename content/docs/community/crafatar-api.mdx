@@ -1,0 +1,90 @@
+---
+title: Crafatar API (Moved to NitroCraft)
+description: Crafatar has moved to NitroCraft. Find migration information and legacy Minecraft avatar API documentation.
+---
+
+import { Callout } from "fumadocs-ui/components/callout";
+
+<CrafatarMigrationNotice />
+
+## Legacy API Overview
+
+Crafatar serves Minecraft avatars, skins, capes, and renders as PNG images using UUID-based routes.
+
+Previous hosted base URL: `https://crafatar.euphoriadevelopment.uk`
+
+Supported methods: `GET` and `HEAD`.
+
+<Callout>Only UUIDs are supported; usernames are rejected.</Callout>
+
+[Legacy Source Repository](https://github.com/EuphoriaTheme/crafatar)
+
+## Endpoints
+
+- **Avatar:** `/avatars/{uuid}` — `size`, `overlay`/`helm`, `default`
+- **Head render:** `/renders/head/{uuid}` — `scale`, `overlay`/`helm`, `default`
+- **Body render:** `/renders/body/{uuid}` — `scale`, `overlay`/`helm`, `default`
+- **Skin:** `/skins/{uuid}` — `default`
+- **Cape:** `/capes/{uuid}` — `default`
+
+Append `.png` to IDs if wanted; output remains PNG.
+
+```bash
+GET https://crafatar.euphoriadevelopment.uk/avatars/069a79f444e94726a5befca90e38aaf5?size=128
+GET https://crafatar.euphoriadevelopment.uk/renders/head/069a79f444e94726a5befca90e38aaf5?scale=6&overlay
+GET https://crafatar.euphoriadevelopment.uk/skins/069a79f444e94726a5befca90e38aaf5.png
+```
+
+## Query Parameters
+
+- **size**: avatar output pixels; default `160`, range `1-512`
+- **scale**: render multiplier; default `6`, range `1-10`
+- **overlay**: enables the second layer; presence means `true`
+- **helm**: legacy alias for `overlay`
+- **default**: fallback image: `steve`, `alex`, `mhf_steve`, `mhf_alex`, UUID, or HTTP(S) URL up to `2048` chars
+
+UUIDs may be dashed or non-dashed; usernames are always invalid.
+
+<Callout>UUID or URL fallbacks return a `307` redirect.</Callout>
+
+## Response Behavior
+
+- **200**: PNG returned.
+- **304**: ETag matched or a stale cached image was reused.
+- **307**: redirect to `default` fallback.
+- **404**: invalid subpath or no result without fallback.
+- **422**: invalid UUID, size, scale, default, or render type.
+- **500/502**: upstream or server issue without usable fallback.
+
+Headers include `ETag`, `Cache-Control: max-age=3600`, `Warning`, `X-Storage-Type`, `X-Request-ID`, `Response-Time`, and `Access-Control-Allow-Origin: *`.
+
+## Integration Examples
+
+### HTML image
+
+```html
+<img
+  src="https://crafatar.euphoriadevelopment.uk/avatars/069a79f444e94726a5befca90e38aaf5?size=96&overlay"
+  alt="Minecraft avatar"
+/>
+```
+
+### JavaScript cache validation
+
+```javascript
+const url =
+  "https://crafatar.euphoriadevelopment.uk/skins/069a79f444e94726a5befca90e38aaf5";
+const res = await fetch(url, { headers: { "If-None-Match": previousEtag } });
+if (res.status === 304) {
+  /* Keep existing image */
+} else if (res.ok) {
+  const nextEtag = res.headers.get("etag");
+  const blob = await res.blob();
+}
+```
+
+### Fallback redirect
+
+```
+https://crafatar.euphoriadevelopment.uk/capes/00000000000000000000000000000000?default=https%3A%2F%2Fcdn.example.com%2Fimg%2Fno-cape.png
+```

@@ -1,0 +1,30 @@
+---
+title: Installation
+description: Install Euphoria Development Blueprint themes and extensions on your Pterodactyl Panel.
+---
+
+import { Callout } from "fumadocs-ui/components/callout";
+
+## Requirements
+
+- Working Pterodactyl installation
+- Blueprint Framework installed
+- Purchased Euphoria resource file
+
+## Install Commands
+
+1. Move the resource file to the panel root: `/var/www/pterodactyl`
+2. Run `cd /var/www/pterodactyl`
+3. Run `blueprint -i Extension.blueprint`
+4. Wait for installation to finish.
+
+Example:
+
+```bash
+mv /home/username/Extension.blueprint /var/www/pterodactyl
+```
+
+<Callout>
+  Keep a backup or snapshot before installing on a production panel so you can
+  roll back quickly.
+</Callout>

@@ -1,0 +1,37 @@
+---
+title: Game API Setup Guide
+description: Configure the Game API integration for Euphoria Development panel extensions.
+---
+
+import { Callout } from "fumadocs-ui/components/callout";
+
+## Install Flow
+
+1. Download Game API from your Euphoria dashboard. A licensed resource is required.
+2. Upload it to the server or NodeJS container.
+3. Extract the package and wait for dependencies to install.
+
+![Game API setup example](/images/docs/gitbook-005.png)
+
+## Environment Variables
+
+Required keys:
+
+```sh
+PORT=2000
+PANEL_URL=https://panel.example.com
+```
+
+- **`PORT`**: runtime or container listening port
+- **`PANEL_URL`**: panel origin used for CORS
+
+## Proxy and TLS
+
+Expose the API behind an NGINX reverse proxy and forward traffic to the local API process, for example `localhost:2000`.
+
+Forward standard headers and keep preflight OPTIONS handling enabled for browser calls.
+
+<Callout>
+  If panel calls fail in the browser, check the CORS origin first, then proxy
+  headers, then TLS certificate or domain mismatch.
+</Callout>

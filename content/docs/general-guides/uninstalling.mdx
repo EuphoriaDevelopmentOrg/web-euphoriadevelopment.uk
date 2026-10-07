@@ -1,0 +1,21 @@
+---
+title: Uninstalling
+description: Remove Euphoria Development Blueprint extensions and themes from your Pterodactyl Panel.
+---
+
+import { Callout } from "fumadocs-ui/components/callout";
+
+## Uninstall Steps
+
+1. Run `cd /var/www/pterodactyl`
+2. Run `blueprint -r Extension.blueprint`
+3. Wait until removal is complete.
+
+## Recovery Command
+
+If panel state becomes inconsistent, run `blueprint -upgrade` and reinstall required addons after maintenance.
+
+<Callout>
+  Schedule uninstall or upgrade work during low-traffic windows and notify staff
+  before changing the panel.
+</Callout>

@@ -219,6 +219,7 @@ test("mobile menu opens and closes after choosing a section", async ({
 
 test("shared docs navigation preserves theme and updates metadata without reloading", async ({
   page,
+  isMobile,
 }) => {
   await page.goto("/docs");
   await page.evaluate(() => {
@@ -226,8 +227,13 @@ test("shared docs navigation preserves theme and updates metadata without reload
   });
   await page.getByRole("link", { name: "Start with Licensing" }).click();
   await expect(page).toHaveTitle("Licensing | Euphoria Development");
-  await page
-    .getByRole("navigation", { name: "Documentation sidebar" })
+  if (isMobile) {
+    await page.getByRole("button", { name: "Open Sidebar" }).click();
+  }
+  const sidebar = isMobile
+    ? page.locator("[data-state='open']")
+    : page.locator("#nd-sidebar");
+  await sidebar
     .getByRole("link", { name: "Installation", exact: true })
     .click();
   await expect(page).toHaveTitle("Installation | Euphoria Development");
@@ -240,13 +246,15 @@ test("shared docs navigation preserves theme and updates metadata without reload
     "preserved",
   );
   await expect(page.locator("body")).toHaveClass("docs-page");
-  await expect(page.locator("header")).toHaveCount(1);
+  await expect(page.locator("header")).toHaveCount(2);
   await expect(page.locator("footer")).toHaveCount(1);
-  await expect(
-    page
-      .getByRole("navigation", { name: "Documentation sidebar" })
-      .getByRole("link", { name: "Installation", exact: true }),
-  ).toHaveAttribute("aria-current", "page");
+  if (!isMobile) {
+    await expect(
+      page
+        .locator("#nd-sidebar")
+        .getByRole("link", { name: "Installation", exact: true }),
+    ).toHaveAttribute("data-active", "true");
+  }
   await page
     .getByRole("navigation", { name: "Documentation footer" })
     .getByRole("link", { name: "Privacy Policy" })
@@ -338,8 +346,8 @@ test("docs index links to every documentation page and all legal policies", asyn
   await page.goto("/docs");
   for (const sitePage of docGroups.flatMap((group) => group.pages)) {
     await expect(
-      page.locator(`#docs-content a[href="${sitePage.path}"]`),
-    ).toHaveCount(1);
+      page.locator(`#docs-content a[href="${sitePage.path}"]`).first(),
+    ).toBeVisible();
   }
   for (const sitePage of legalPages)
     await expect(page.locator(`footer a[href="${sitePage.path}"]`)).toHaveCount(

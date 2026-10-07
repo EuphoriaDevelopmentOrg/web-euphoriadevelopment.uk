@@ -1,0 +1,27 @@
+---
+title: Player Listing
+description: Set up the Player Listing extension and display player information in your Pterodactyl Panel.
+---
+
+import { Callout } from "fumadocs-ui/components/callout";
+
+## Before You Start
+
+- Use the hosted Game API, or self-host your own API.
+- Confirm the API endpoint is reachable from the panel.
+- Open a game server and navigate to its Players section.
+
+![Player listing page example](/images/docs/gitbook-011.png)
+
+## Page Controls
+
+- **Refresh**: run a new API query
+- **Select Game**: pick a game profile
+- **Custom Query Port**: override the server query port
+- **Save Port**: persist a custom port
+- **Reset to Default**: clear the override
+
+<Callout>
+  If no players are shown, verify the query port and check firewall rules for
+  game-server query traffic.
+</Callout>

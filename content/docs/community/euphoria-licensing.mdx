@@ -1,0 +1,83 @@
+---
+title: Euphoria Licensing
+description: Explore Euphoria Licensing for product validation and license management, with demo and marketplace links.
+---
+
+import { Callout } from "fumadocs-ui/components/callout";
+
+## Overview
+
+**Euphoria Licensing** is a proprietary self-hosted web application for license operations, product validation workflows, and admin management.
+
+<Callout>
+  A valid commercial license is required to deploy this software.
+  Redistribution, sublicensing, or source resale is not allowed.
+</Callout>
+
+[Live Demo](https://l-demo.euphoriadevelopment.uk/) · [BuiltByBit](https://builtbybit.com/resources/53120/) · [SourceXchange](https://www.sourcexchange.net/resources/1806) · [Licensing Guide](/docs/general-guides/licensing) · [Support Discord](https://discord.gg/Cus2zP4pPH)
+
+## Minimum Requirements
+
+- **OS:** Linux recommended; Windows Server/Desktop supported
+- **Runtime:** Node.js `22.x` and pnpm `10.22.0`
+- **Database:** PostgreSQL `14+`; 15, 16, or 17 recommended
+- **Memory:** 2 GB minimum, 4 GB recommended
+- **Production:** reverse proxy and TLS for public deployment
+
+## Quick Install
+
+For first boot on a production-like host:
+
+```bash
+cp .env.example .env
+pnpm install --frozen-lockfile
+pnpm db:migrate
+pnpm seed
+pnpm build
+pnpm start
+```
+
+Open `http://SERVER_IP:3000` or your domain, then rotate seeded admin credentials immediately.
+
+## Required Environment Values
+
+- `APP_URL`: public HTTPS URL for auth callbacks and generated links
+- `BETTER_AUTH_SECRET`: strong random auth secret
+- `APP_GUARD_TOKEN`: distribution license guard token
+- `POSTGRES_URL` or `POSTGRES_*`: database connection configuration
+- `HOST`/`PORT`: runtime bind values, normally `0.0.0.0` and `3000`
+
+<Callout>
+  Set `APP_DATA_ENCRYPTION_KEY`, configure `TRUST_REVERSE_PROXY=true`, and
+  restrict `CORS_ORIGINS` to known origins.
+</Callout>
+
+## Production Flow
+
+1. Provision PostgreSQL and create a dedicated database and user.
+2. Install dependencies and configure `.env`.
+3. Run `pnpm db:migrate`, or `pnpm db:push` for initial boot if required.
+4. Seed the initial admin with `pnpm seed` if needed.
+5. Build and run via `pnpm build` and `pnpm start`.
+6. Put the app behind Nginx or Caddy and enable HTTPS.
+
+Built runtime entrypoint: `.output/server/index.mjs`
+
+## Health Checks
+
+After go-live, verify these endpoints:
+
+```bash
+curl -fsS https://licensing.example.com/api/system/health
+curl -fsS https://licensing.example.com/api/system/ready
+curl -fsS https://licensing.example.com/openapi.json
+```
+
+Smoke test admin login, product listing, license validation endpoint, and logs view.
+
+## Troubleshooting
+
+- **`APP_GUARD_TOKEN is missing`:** set it in `.env` and restart.
+- **Database connection failed:** re-check `POSTGRES_URL`, `POSTGRES_*`, and firewall access.
+- **Build failures:** confirm Node.js `22.x` and pnpm `10.22.0`, then reinstall dependencies.
+- **App unreachable:** check process health and proxy target, normally `127.0.0.1:3000`.

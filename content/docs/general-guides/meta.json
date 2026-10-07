@@ -1,0 +1,10 @@
+{
+  "title": "General Guides",
+  "pages": [
+    "licensing",
+    "licensed-resources",
+    "site-and-api",
+    "installation",
+    "uninstalling"
+  ]
+}

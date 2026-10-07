@@ -1,0 +1,106 @@
+---
+title: NitroCraft Setup
+description: Set up NitroCraft for Minecraft profile assets and rendering.
+---
+
+import { Callout } from "fumadocs-ui/components/callout";
+
+## Deployment Options
+
+- **Hosted:** use `https://nitrocraft.uk` directly.
+- **Self-hosted:** use pnpm workflows, Docker Compose, or your own orchestration.
+
+<Callout>
+  For route and parameter details, see [NitroCraft API
+  Docs](/docs/community/nitrocraft-api).
+</Callout>
+
+## Local Development
+
+Recommended local workflow:
+
+```bash
+corepack enable
+nvm use
+pnpm install
+pnpm dev
+```
+
+Additional scripts:
+
+```bash
+pnpm test
+pnpm lint
+```
+
+## Build and Run Production Output
+
+```bash
+pnpm build
+pnpm start
+```
+
+This runs the built Nitro output for production-style testing.
+
+## Docker Quick Start
+
+```bash
+cp .env.example .env
+docker compose up -d
+```
+
+Follow logs with `docker compose logs -f`.
+
+<Callout>
+  Render endpoints require native `canvas` dependencies in the runtime image or
+  environment.
+</Callout>
+
+## Key Environment Values
+
+- `CACHE_BACKEND`: `redis`, `memory`, or `none`
+- `REDIS_URL`: Redis connection string
+- `SESSIONS_RATE_LIMIT`: outbound Mojang-session request limit
+- `REQUESTS_RATE_LIMIT` and related options: inbound limiting
+- `STATUS_ALLOW_PRIVATE_TARGETS`: private-target probing
+- `STATUS_BROWSER_*`: browser probe limits, timeouts, and feeds
+- `PORT`, `BIND`, `EXTERNAL_URL`: runtime networking
+- `CORS_ORIGIN`: browser integration policy
+- `RETENTION_*`: cleanup retention and interval controls
+
+## Pterodactyl and Release Automation
+
+- Pterodactyl [egg-nitrocraft.json](https://github.com/EuphoriaDevelopmentOrg/NitroCraft/blob/main/pterodactyl%20egg/egg-nitrocraft.json)
+- Docker Hub workflow: `.github/workflows/docker-publish.yml`
+- Release workflow: `.github/workflows/build-release.yml`
+
+The Docker Hub workflow supports branch pushes, semantic tags, schedules, and manual dispatch.
+
+## Reverse Proxy Example (NGINX)
+
+```nginx
+server {
+  listen 443 ssl http2;
+  server_name nitrocraft.example.com;
+
+  location / {
+    proxy_pass http://127.0.0.1:3000;
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  }
+}
+```
+
+## Validation and Troubleshooting
+
+```bash
+curl -fsS https://nitrocraft.example.com/docs
+curl -fsS https://nitrocraft.example.com/metrics
+curl -fsS "https://nitrocraft.example.com/status/server?address=example.org&edition=auto"
+```
+
+- For render failures, verify native `canvas` dependencies.
+- For unexpected status-probe failures, check `STATUS_ALLOW_PRIVATE_TARGETS` and rate limits.
+- For blocked browser calls, verify `CORS_ORIGIN` and proxy headers.
+- When Redis is unavailable, switch to memory backend and review fallback persistence.

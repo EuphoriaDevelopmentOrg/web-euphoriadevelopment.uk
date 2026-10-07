@@ -1,0 +1,131 @@
+---
+title: Crafatar Setup (Moved to NitroCraft)
+description: Read the legacy Crafatar setup guide and find NitroCraft, its new home for Minecraft avatars and renders.
+---
+
+import { Callout } from "fumadocs-ui/components/callout";
+
+<CrafatarMigrationNotice />
+
+## Legacy Deployment Options
+
+These instructions cover self-hosted Crafatar using Docker, Docker Compose, Pterodactyl Panel, or Node.js with Redis.
+
+<Callout>
+  For endpoint and parameter reference, use [Crafatar API
+  Docs](/docs/community/crafatar-api).
+</Callout>
+
+## Docker Quick Start
+
+Fast single-host deployment with a dedicated Redis container:
+
+```bash
+docker network create crafatar
+docker run --net crafatar -d --name redis redis:7-alpine
+docker run --net crafatar \
+  -v crafatar-images:/home/app/crafatar/images \
+  -e CACHE_BACKEND=redis \
+  -e REDIS_URL=redis://redis:6379 \
+  -e BIND=0.0.0.0 \
+  -e PORT=3000 \
+  -e EXTERNAL_URL=https://crafatar.example.com \
+  -p 3000:3000 \
+  docker.io/repgraphics/crafatar:latest
+```
+
+The service is available at `http://0.0.0.0:3000` behind your proxy or domain.
+
+## Docker Compose
+
+Uses the legacy repository's `docker-compose.yml` with Redis health checks and persistent volumes.
+
+```bash
+git clone https://github.com/EuphoriaTheme/crafatar.git
+cd crafatar
+cp .env.example .env
+docker compose up -d
+docker compose logs -f crafatar
+```
+
+Windows PowerShell: `Copy-Item .env.example .env`, then `docker compose up -d`. The stack binds `3000:3000`, mounts `crafatar-images`, and stores Redis data in `redis-data`.
+
+## Pterodactyl Panel Installation
+
+Use the [official Crafatar egg](https://github.com/EuphoriaTheme/crafatar/tree/master/pterodactyl%20egg).
+
+1. Import `egg-crafatar.json` into a Pterodactyl nest.
+2. Create a server using `docker.io/repgraphics/crafatar:latest`.
+3. Set `BIND=0.0.0.0` and `EXTERNAL_URL` to your domain.
+4. Use `CACHE_BACKEND=redis` and `REDIS_URL=redis://host:6379`, or `CACHE_BACKEND=memory` without Redis.
+5. Start the server and confirm `Server running on http://`.
+
+```sh
+CACHE_BACKEND=redis
+REDIS_URL=redis://redis.example.internal:6379
+BIND=0.0.0.0
+EXTERNAL_URL=https://crafatar.example.com
+SOURCE_REPO=EuphoriaTheme/crafatar
+SOURCE_REF=master
+```
+
+## Manual Setup
+
+- Install Node.js 24 LTS.
+- Install and run Redis.
+- Clone the repository and install dependencies.
+
+```bash
+git clone https://github.com/EuphoriaTheme/crafatar.git
+cd crafatar
+npm install
+cp .env.example .env
+npm start
+```
+
+If `node-canvas` fails, install its documented system dependencies.
+
+## Required Configuration
+
+- `CACHE_BACKEND=redis`, `memory`, or `none`
+- `REDIS_URL=redis://host:6379`, or `rediss://` for TLS
+- `PORT=3000` and `BIND=0.0.0.0`
+- `EXTERNAL_URL=https://crafatar.example.com`
+- `CACHE_LOCAL=1200` and `CACHE_BROWSER=3600`
+- `RETENTION_ENABLED=true`, `RETENTION_DAYS=30`, `RETENTION_INTERVAL_HOURS=24`
+
+<Callout>
+  `REDIS_URL` must use `redis://` or `rediss://`; an invalid protocol disables
+  Redis caching on startup.
+</Callout>
+
+## Reverse Proxy Example (NGINX)
+
+```nginx
+server {
+  listen 443 ssl http2;
+  server_name crafatar.example.com;
+
+  location / {
+    proxy_pass http://127.0.0.1:3000;
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  }
+}
+```
+
+Crafatar reads forwarded headers when `EXTERNAL_URL` is not set.
+
+## Validation and Troubleshooting
+
+```bash
+curl -I "http://127.0.0.1:3000/avatars/069a79f444e94726a5befca90e38aaf5?size=64"
+curl -I "http://127.0.0.1:3000/renders/head/069a79f444e94726a5befca90e38aaf5?scale=4"
+```
+
+- Expect `200` and `image/png` for valid requests.
+- Expect `422` for invalid UUID, size, scale, or default values.
+- For slow responses, verify Redis and Mojang-service egress.
+- For stale skins, lower `CACHE_LOCAL` or clear image cache/Redis keys.
+- For full storage, tune retention and monitor inode usage.
