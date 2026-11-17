@@ -9,19 +9,15 @@ import {
   Boxes,
   Check,
   CodeXml,
-  Folder,
   GitFork,
   Heart,
-  Layers,
   Menu,
   MessageCircle,
   Palette,
   Puzzle,
   Server,
-  ShieldCheck,
   Star,
   Tag,
-  Terminal,
   Users,
   X,
   type LucideIcon,
@@ -29,6 +25,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import PanelPreview from "@/components/home/PanelPreview";
 import { fetchContributors, type Contributor } from "@/utils/contributors";
 import { fetchDonators, type Donator } from "@/utils/donators";
 import {
@@ -266,7 +263,7 @@ export function Home() {
                 </span>
               </div>
             </div>
-            <WorkspacePreview />
+            <PanelPreview />
           </div>
         </section>
         <FeaturedProjects />
@@ -361,106 +358,6 @@ function Outbound({
       {children}
       <ArrowUpRight size={15} aria-hidden="true" />
     </a>
-  );
-}
-
-function WorkspacePreview() {
-  return (
-    <div className="hero-preview">
-      <div
-        className="workspace-preview"
-        aria-label="Illustrative Aquadactyl interface"
-      >
-        <div className="preview-titlebar">
-          <span>
-            <Image
-              src="/brand/aquadactyl-emblem.png"
-              alt=""
-              width={24}
-              height={24}
-            />
-            Aquadactyl
-          </span>
-          <span className="preview-label">Interface preview</span>
-        </div>
-        <div className="preview-body">
-          <div className="preview-sidebar" aria-hidden="true">
-            <Server />
-            <Folder />
-            <Terminal />
-            <ShieldCheck />
-          </div>
-          <div className="preview-content">
-            <div className="preview-heading">
-              <span>
-                Your servers<small>One place to manage your community.</small>
-              </span>
-              <span className="preview-avatar">ED</span>
-            </div>
-            {[
-              {
-                name: "Community Survival",
-                detail: "Minecraft · Your community",
-                status: "Running",
-                active: true,
-              },
-              {
-                name: "Creative World",
-                detail: "Minecraft · Build something new",
-                status: "Running",
-                active: true,
-              },
-              {
-                name: "Development",
-                detail: "A space to try your next idea",
-                status: "Offline",
-                active: false,
-              },
-            ].map((server) => (
-              <div key={server.name} className="preview-server">
-                <span className="preview-server-icon">
-                  <Server size={18} aria-hidden="true" />
-                </span>
-                <span className="preview-server-name">
-                  {server.name}
-                  <small>{server.detail}</small>
-                </span>
-                <span
-                  className={`preview-status ${server.active ? "is-running" : ""}`}
-                >
-                  <i />
-                  {server.status}
-                </span>
-              </div>
-            ))}
-            <div className="preview-console">
-              <span>
-                <Terminal size={13} aria-hidden="true" />
-                Console
-              </span>
-              <p>
-                <b>›</b> Your server is ready. Make it yours.
-              </p>
-              <div>
-                <i />
-                Type a command…
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="preview-footer">
-          <Puzzle size={13} aria-hidden="true" />
-          Blueprint included<span>Built on Pterodactyl</span>
-        </div>
-      </div>
-      <div className="preview-caption">
-        <span>
-          <Layers size={15} aria-hidden="true" />
-          Aquadactyl panel + Manta daemon
-        </span>
-        <span>Illustrative interface · sample data</span>
-      </div>
-    </div>
   );
 }
 

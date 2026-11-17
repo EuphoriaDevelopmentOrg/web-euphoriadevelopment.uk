@@ -222,11 +222,9 @@ test("Aquadactyl and Manta remain discoverable when external services fail", asy
       logo: "/brand/manta-logo.png",
     },
   ]) {
-    const card = page
-      .locator("#projects article")
-      .filter({
-        has: page.getByRole("heading", { name: project.name, exact: true }),
-      });
+    const card = page.locator("#projects article").filter({
+      has: page.getByRole("heading", { name: project.name, exact: true }),
+    });
     await expect(
       card.getByRole("heading", { name: project.name, exact: true }),
     ).toBeVisible();
@@ -250,6 +248,74 @@ test("Aquadactyl and Manta remain discoverable when external services fail", asy
   await expect(
     page.getByRole("link", { name: "Explore our projects" }),
   ).toHaveAttribute("href", "#projects");
+  await expectNoOverflow(page);
+});
+
+test("panel preview supports keyboard navigation, demo power and console commands", async ({
+  page,
+}) => {
+  await page.goto("/");
+  const preview = page.getByRole("region", {
+    name: "Aquadactyl panel preview",
+  });
+  const consoleTab = preview.getByRole("tab", { name: "Console", exact: true });
+  const serversTab = preview.getByRole("tab", {
+    name: "Your servers",
+    exact: true,
+  });
+  const consolePanel = preview.getByRole("tabpanel", {
+    name: "Console",
+    exact: true,
+  });
+  await expect(consoleTab).toHaveAttribute("aria-selected", "true");
+  await preview
+    .getByRole("button", { name: "Stop demo server", exact: true })
+    .click();
+  await expect(
+    consolePanel.getByText("Offline", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    preview.getByRole("button", { name: "Restart demo server" }),
+  ).toBeDisabled();
+  const consoleHeight = (await preview.boundingBox())!.height;
+  await serversTab.click();
+  const serversPanel = preview.getByRole("tabpanel", { name: "Your servers" });
+  await expect(serversPanel.getByText("Offline", { exact: true })).toHaveCount(
+    2,
+  );
+  expect(
+    Math.abs((await preview.boundingBox())!.height - consoleHeight),
+  ).toBeLessThan(1);
+  await serversTab.press("ArrowLeft");
+  await expect(consoleTab).toBeFocused();
+  await expect(consolePanel).toBeVisible();
+  await preview
+    .getByRole("button", { name: "Start demo server", exact: true })
+    .click();
+  await expect(
+    consolePanel.getByText("Running", { exact: true }),
+  ).toBeVisible();
+  const command = preview.getByRole("textbox", {
+    name: "Demo console command",
+  });
+  await command.fill("list");
+  await command.press("Enter");
+  await expect(
+    consolePanel.getByText("There are 2 players online: Alex, Sam", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(command).toHaveValue("");
+  await preview.getByRole("button", { name: "Restart demo server" }).click();
+  await expect(
+    consolePanel.getByText("Demo server restarted. Ready for players.", {
+      exact: true,
+    }),
+  ).toBeVisible();
+  await serversTab.click();
+  await serversPanel.getByRole("button", { name: "Open console" }).click();
+  await expect(consoleTab).toBeFocused();
+  await expect(consolePanel).toBeVisible();
   await expectNoOverflow(page);
 });
 
