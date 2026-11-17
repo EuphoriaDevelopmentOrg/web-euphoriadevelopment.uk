@@ -110,14 +110,14 @@ test("catalogue and demos appear before GitHub responds; counts use API data", a
       ).toHaveAttribute("href", href);
     }
     await expect(page.locator("#statistics strong")).toHaveText([
-      "6",
+      "8",
       "0",
       "42",
     ]);
     expect(statsRequests).toBe(1);
     expect(githubRequests).toBeGreaterThan(0);
     const sections = await page
-      .locator("main > section[id]")
+      .locator("main section[id]")
       .evaluateAll((elements) => elements.map((element) => element.id));
     expect(sections.indexOf("products")).toBeLessThan(
       sections.indexOf("contributors"),
@@ -174,7 +174,7 @@ test("API outage shows unavailable values and supports retry without hiding web 
   await expect(
     page.getByRole("heading", { name: "Example Addon", exact: true }),
   ).toBeVisible();
-  await expect(page.locator("#statistics strong")).toHaveText(["6", "0", "42"]);
+  await expect(page.locator("#statistics strong")).toHaveText(["8", "0", "42"]);
 });
 
 test("missing and invalid statistics stay unknown while a valid empty catalogue is shown", async ({
@@ -191,11 +191,108 @@ test("missing and invalid statistics stay unknown while a valid empty catalogue 
   );
   await page.goto("/");
   await expect(page.locator("#statistics strong")).toHaveText([
-    "4",
+    "6",
     "Unavailable",
     "Unavailable",
   ]);
   await expect(page.getByText("No Blueprint addons found yet.")).toBeVisible();
+});
+
+test("Aquadactyl and Manta remain discoverable when external services fail", async ({
+  page,
+  request,
+}) => {
+  await page.route("https://api.euphoriadevelopment.uk/**", (route) =>
+    route.fulfill({ status: 503, json: {} }),
+  );
+  await page.goto("/");
+  for (const project of [
+    {
+      name: "Aquadactyl",
+      href: "https://aquadactyl.uk/",
+      repository: "https://github.com/Aquadactyl/aquadactyl",
+      docs: "/docs/community/aquadactyl",
+      logo: "/brand/aquadactyl-emblem.png",
+    },
+    {
+      name: "Manta",
+      href: "https://aquadactyl.uk/docs/manta",
+      repository: "https://github.com/Aquadactyl/manta",
+      docs: "/docs/community/manta",
+      logo: "/brand/manta-logo.png",
+    },
+  ]) {
+    const card = page
+      .locator("#projects article")
+      .filter({
+        has: page.getByRole("heading", { name: project.name, exact: true }),
+      });
+    await expect(
+      card.getByRole("heading", { name: project.name, exact: true }),
+    ).toBeVisible();
+    await expect(
+      card.getByRole("link", { name: `Explore ${project.name}` }),
+    ).toHaveAttribute("href", project.href);
+    await expect(
+      card.getByRole("link", { name: "Source code" }),
+    ).toHaveAttribute("href", project.repository);
+    await expect(
+      card.getByRole("link", { name: "Source code" }),
+    ).toHaveAttribute("rel", "noopener noreferrer");
+    await expect(
+      card.getByRole("link", { name: "Project overview" }),
+    ).toHaveAttribute("href", project.docs);
+    expect((await request.get(project.logo)).ok()).toBe(true);
+  }
+  await expect(
+    page.getByText("Illustrative interface · sample data"),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Explore our projects" }),
+  ).toHaveAttribute("href", "#projects");
+  await expectNoOverflow(page);
+});
+
+test("project overview pages link to the official installation guides", async ({
+  page,
+}) => {
+  for (const [route, guide] of [
+    [
+      "/docs/community/aquadactyl",
+      "https://aquadactyl.uk/docs/panel/installing-the-panel",
+    ],
+    [
+      "/docs/community/manta",
+      "https://aquadactyl.uk/docs/manta/installing-manta",
+    ],
+  ]) {
+    await page.goto(route);
+    await expect(
+      page.locator(`#docs-content a[href="${guide}"]`),
+    ).toBeVisible();
+  }
+});
+
+test("compact layouts and keyboard menu dismissal remain usable", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 800 });
+  await page.goto("/");
+  await expectNoOverflow(page);
+  const menu = page.getByRole("button", { name: "Menu", exact: true });
+  await menu.click();
+  await page
+    .getByRole("button", { name: "Close", exact: true })
+    .press("Escape");
+  await expect(menu).toHaveAttribute("aria-expanded", "false");
+  await expect(menu).toBeFocused();
+  await menu.click();
+  await page
+    .locator("#mobile-navigation")
+    .getByRole("link", { name: "Projects", exact: true })
+    .click();
+  await expect(page).toHaveURL(/#projects$/);
+  await expect(menu).toHaveAttribute("aria-expanded", "false");
 });
 
 test("mobile menu opens and closes after choosing a section", async ({

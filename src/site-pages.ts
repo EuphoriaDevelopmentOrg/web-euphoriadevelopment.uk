@@ -105,6 +105,18 @@ export const docGroups: DocGroup[] = [
     title: "Community",
     pages: [
       {
+        path: "/docs/community/aquadactyl",
+        title: "Aquadactyl",
+        description:
+          "Explore Aquadactyl, Euphoria Development's open-source game server panel with Blueprint included, custom branding and modern account security.",
+      },
+      {
+        path: "/docs/community/manta",
+        title: "Manta",
+        description:
+          "Meet Manta, the Wings-compatible server daemon for Aquadactyl, with Docker server management, files, backups and SFTP.",
+      },
+      {
         path: "/docs/community/web-apps",
         title: "Web Apps",
         description:
@@ -192,15 +204,15 @@ export const legalPages: SitePage[] = [
 export const sitePages: SitePage[] = [
   {
     path: "/",
-    title: "Euphoria Development | Blueprints & Web Apps",
+    title: "Euphoria Development | Game Server Tools & Software",
     description:
-      "Blueprint-powered themes and extensions for Pterodactyl Panel, plus web apps and APIs from Euphoria Development.",
+      "Explore Aquadactyl, Manta, Blueprint themes and addons, Euphoria Paste, Licensing and NitroCraft. Practical software for game server communities.",
   },
   {
     path: "/docs",
     title: "Documentation",
     description:
-      "Guides for Euphoria Development themes, Blueprint addons, web apps, APIs, installation, and licensing.",
+      "Guides for Aquadactyl, Manta, Euphoria Development themes, Blueprint addons, web apps, APIs, installation and licensing.",
   },
   ...docGroups.flatMap((group) => group.pages),
   ...legalPages,

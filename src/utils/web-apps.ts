@@ -23,7 +23,8 @@ export type WebApp = {
 
 export const freePaste = {
   name: "Euphoria Paste (Free)",
-  description: "Free, open-source paste platform.",
+  description:
+    "Share logs, code and text with a free, open-source paste platform.",
   repository: "EuphoriaDevelopmentOrg/Euphoria-Paste",
   links: [
     {
@@ -44,7 +45,7 @@ export const freePaste = {
 
 export const paidPaste = {
   name: "Euphoria Paste (Paid)",
-  description: "Paid paste platform.",
+  description: "A commercial edition of Euphoria Paste for your own community.",
   repository: null,
   links: [
     {
@@ -61,7 +62,8 @@ export const paidPaste = {
 
 export const euphoriaLicensing = {
   name: "Euphoria Licensing",
-  description: "License operations, product validation, and admin management.",
+  description:
+    "Manage software licences, validate products and oversee access from one place.",
   repository: null,
   links: [
     {
