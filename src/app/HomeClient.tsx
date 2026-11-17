@@ -426,6 +426,9 @@ function FeaturedProjects() {
                 >
                   Explore {project.name}
                 </Outbound>
+                {"demo" in project && (
+                  <Outbound href={project.demo}>Live demo</Outbound>
+                )}
                 <Outbound href={project.docs}>Installation guide</Outbound>
               </div>
               <div className="project-card-footer">
