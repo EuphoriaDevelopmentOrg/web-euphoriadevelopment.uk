@@ -1,6 +1,8 @@
 {
   "title": "Community",
   "pages": [
+    "aquadactyl",
+    "manta",
     "web-apps",
     "euphoria-licensing",
     "crafatar-api",

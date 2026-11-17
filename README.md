@@ -12,7 +12,7 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Build for production with `pnpm build`. Use `pnpm start` to run the production server locally, or `pnpm preview` to run on port 4173.
+Build for production with `pnpm build`. Use `pnpm start` to run the production server locally, or `pnpm exec next start --port 4173` to use the browser tests' port.
 
 ## Checks
 
@@ -23,17 +23,18 @@ pnpm exec playwright install chromium
 pnpm check
 ```
 
-`pnpm check` runs oxlint, TypeScript, a production build, and Playwright browser tests. On Linux, install browser system dependencies with `pnpm exec playwright install --with-deps chromium`.
+`pnpm check` runs oxlint, TypeScript, a production build, and Playwright browser tests. The tests start the built Next.js application on port 4173. On Linux, install browser system dependencies with `pnpm exec playwright install --with-deps chromium`.
 
 The tests cover direct docs and legal routes, shared navigation and theme cleanup, mobile layouts, product links, API/GitHub outages, retry behavior, statistics, generated page metadata, and the sitemap. External APIs are mocked. Failed browser tests save screenshots and traces in `test-results/` and an HTML report in `playwright-report/`.
 
 ## Content and metadata
 
 - `src/utils/web-apps.ts` contains the app listings, demos, and marketplace links. Listings render immediately; optional GitHub metadata loads separately.
+- `src/utils/projects.ts` contains the Aquadactyl and Manta listings, logos and official links. These render before optional API data arrives, including during catalogue outages.
 - `src/utils/site-data.ts` shares concurrent requests to the stats API. Blueprints render as soon as the catalogue arrives. GitHub failures do not hide products.
-- Project totals count returned Blueprints plus current web app editions. Free and paid Paste count separately; the Crafatar migration card does not count again. Unavailable statistics are labelled as unavailable; actual zero values stay zero.
+- Project totals count Aquadactyl and Manta, returned Blueprints, and current web app editions. Free and paid Paste count separately; the Crafatar migration notice does not count again. Unavailable statistics are labelled as unavailable; actual zero values stay zero.
 - `src/site-pages.ts` defines page titles, descriptions, docs groups, and canonical paths. When adding a route, add it there as well as in `src/app/`.
-- `src/components/DocsLayout.tsx` owns the docs header, sidebar, footer, and theme. Article components contain only their page content.
+- `src/app/docs/layout.tsx` owns the docs header, sidebar and footer. Article components contain only their page content.
 - `src/app/sitemap.ts` generates `sitemap.xml` dynamically using Next.js Metadata Route.
 - Next.js pre-renders all pages at build time with route-specific HTML metadata (titles, canonical links, open graph, and twitter tags).
 
