@@ -114,7 +114,7 @@ export const docGroups: DocGroup[] = [
         path: "/docs/community/manta",
         title: "Manta",
         description:
-          "Meet Manta, the Wings-compatible server daemon for Aquadactyl, with Docker server management, files, backups and SFTP.",
+          "Meet Manta, Aquadactyl’s server daemon from Euphoria Development, with Docker server management, files, backups and SFTP.",
       },
       {
         path: "/docs/community/web-apps",

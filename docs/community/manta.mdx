@@ -1,22 +1,26 @@
 ---
 title: Manta
-description: Meet Manta, the Wings-compatible server daemon for Aquadactyl, with Docker server management, files, backups and SFTP.
+description: Meet Manta, Aquadactyl's server daemon from Euphoria Development, with Docker server management, files, backups and SFTP.
 ---
 
-Manta is the server daemon behind [Aquadactyl](/docs/community/aquadactyl), based on
-Pterodactyl Wings. The panel provides the user interface; Manta runs on your nodes
-and manages the game containers.
+Manta is the server daemon behind [Aquadactyl](/docs/community/aquadactyl),
+maintained by Euphoria Development. The panel provides the user interface;
+Manta runs on your nodes and manages the game containers.
 
 ## What Manta handles
 
 - Docker game server installations, power actions and transfers.
-- Console connections through the Wings HTTP and WebSocket APIs.
+- Console connections through Manta's HTTP and WebSocket APIs.
 - Server files, backups and SFTP access.
 - Linux deployment, with native macOS support for development and small hosts.
 
 Manta retains Wings-compatible API routes and configuration paths. Verify
 compatibility with your panel version and test your workload before replacing a
 running daemon. Manta is currently in beta.
+
+Manta is derived from [Pterodactyl Wings](https://github.com/pterodactyl/wings),
+with upstream credits preserved under its MIT license. Legacy command, service
+and directory names remain for existing node compatibility.
 
 ## Get started
 
