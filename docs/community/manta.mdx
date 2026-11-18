@@ -14,17 +14,21 @@ Manta runs on your nodes and manages the game containers.
 - Server files, backups and SFTP access.
 - Linux deployment, with native macOS support for development and small hosts.
 
-Manta retains Wings-compatible API routes and configuration paths. Verify
+Manta retains compatible node APIs. Linux configuration now defaults to
+`/etc/aquadactyl/config.yml`, with discovery of an existing legacy file when the
+new default is absent. Verify
 compatibility with your panel version and test your workload before replacing a
 running daemon. Manta is currently in beta.
 
 Manta is derived from [Pterodactyl Wings](https://github.com/pterodactyl/wings),
 with upstream credits preserved under its MIT license. Legacy command, service
-and directory names remain for existing node compatibility.
+and data-directory names remain for existing node compatibility. See the
+[configuration migration guide](https://aquadactyl.uk/docs/manta/installing-manta#migrate-config)
+before changing an existing service or Docker mount.
 
 ## Get started
 
-The current release is [Manta v1.1-beta](https://github.com/Aquadactyl/manta/releases/tag/v1.1-beta),
+The current release is [Manta v1.1-beta.1](https://github.com/Aquadactyl/manta/releases/tag/v1.1-beta.1),
 with downloads for Linux and macOS on AMD64 and ARM64. It includes the Manta /
 Aquadactyl branding updates and keeps diagnostics local unless an operator
 explicitly chooses an upload service.
