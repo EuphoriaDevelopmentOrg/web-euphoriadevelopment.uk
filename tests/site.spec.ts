@@ -264,63 +264,111 @@ test("panel preview supports keyboard navigation, demo power and console command
     name: "Aquadactyl panel preview",
   });
   const consoleTab = preview.getByRole("tab", { name: "Console", exact: true });
-  const serversTab = preview.getByRole("tab", {
-    name: "Your servers",
+  const filesTab = preview.getByRole("tab", {
+    name: "Files",
     exact: true,
   });
   const consolePanel = preview.getByRole("tabpanel", {
     name: "Console",
     exact: true,
   });
+  await expect(preview.getByRole("tab")).toHaveCount(10);
   await expect(consoleTab).toHaveAttribute("aria-selected", "true");
   await preview
     .getByRole("button", { name: "Stop demo server", exact: true })
     .click();
   await expect(
-    consolePanel.getByText("Offline", { exact: true }),
-  ).toBeVisible();
-  await expect(
-    preview.getByRole("button", { name: "Restart demo server" }),
+    preview.getByRole("textbox", { name: "Demo console command" }),
   ).toBeDisabled();
-  const consoleHeight = (await preview.boundingBox())!.height;
-  await serversTab.click();
-  const serversPanel = preview.getByRole("tabpanel", { name: "Your servers" });
-  await expect(serversPanel.getByText("Offline", { exact: true })).toHaveCount(
-    2,
-  );
-  expect(
-    Math.abs((await preview.boundingBox())!.height - consoleHeight),
-  ).toBeLessThan(1);
-  await serversTab.press("ArrowLeft");
+  await expect(
+    preview.getByRole("button", { name: "Start demo server", exact: true }),
+  ).toBeEnabled();
+  await filesTab.click();
+  await expect(
+    preview
+      .getByRole("tabpanel", { name: "Files", exact: true })
+      .getByRole("heading", { name: "File manager" }),
+  ).toBeVisible();
+  await filesTab.press("ArrowLeft");
   await expect(consoleTab).toBeFocused();
   await expect(consolePanel).toBeVisible();
   await preview
     .getByRole("button", { name: "Start demo server", exact: true })
     .click();
-  await expect(
-    consolePanel.getByText("Running", { exact: true }),
-  ).toBeVisible();
   const command = preview.getByRole("textbox", {
     name: "Demo console command",
   });
+  await expect(command).toBeEnabled();
   await command.fill("list");
   await command.press("Enter");
   await expect(
-    consolePanel.getByText("There are 2 players online: Alex, Sam", {
+    consolePanel.getByText("There are 1 of a max of 20 players online: Rep", {
       exact: true,
     }),
   ).toBeVisible();
   await expect(command).toHaveValue("");
   await preview.getByRole("button", { name: "Restart demo server" }).click();
   await expect(
-    consolePanel.getByText("Demo server restarted. Ready for players.", {
+    consolePanel.getByText("container@aquadactyl~ Restarting server...", {
       exact: true,
     }),
   ).toBeVisible();
-  await serversTab.click();
-  await serversPanel.getByRole("button", { name: "Open console" }).click();
+  await expect(command).toBeEnabled();
+  await consoleTab.press("End");
+  const activityTab = preview.getByRole("tab", {
+    name: "Activity",
+    exact: true,
+  });
+  await expect(activityTab).toBeFocused();
+  await expect(
+    preview.getByRole("tabpanel", { name: "Activity", exact: true }),
+  ).toContainText("Recent activity");
+  await activityTab.press("Home");
   await expect(consoleTab).toBeFocused();
   await expect(consolePanel).toBeVisible();
+  await expectNoOverflow(page);
+});
+
+test("panel preview reuses the file manager, backups and settings views", async ({
+  page,
+  request,
+}) => {
+  await page.goto("/");
+  const preview = page.getByRole("region", {
+    name: "Aquadactyl panel preview",
+  });
+  expect((await request.get("/brand/aquadactyl-wordmark.png")).ok()).toBe(true);
+  await expect(
+    preview.getByRole("link", { name: "Open live demo" }),
+  ).toHaveAttribute("href", "https://demo.aquadactyl.uk");
+  await preview.getByRole("tab", { name: "Files", exact: true }).click();
+  await preview.getByRole("button", { name: /server\.properties/ }).click();
+  await expect(preview.locator("pre")).toContainText("max-players=20");
+  await preview.getByRole("button", { name: "Back to files" }).click();
+  await preview.getByRole("button", { name: /plugins.*Directory/ }).click();
+  await expect(
+    preview.getByRole("button", { name: /README\.txt/ }),
+  ).toBeVisible();
+
+  await preview.getByRole("tab", { name: "Backups", exact: true }).click();
+  await preview.getByRole("button", { name: "Create backup" }).click();
+  await expect(
+    preview.getByText("manual-backup-1", { exact: true }),
+  ).toBeVisible();
+
+  await preview.getByRole("tab", { name: "Settings", exact: true }).click();
+  await preview
+    .getByRole("textbox", { name: "Server name", exact: true })
+    .fill("My community server");
+  await preview
+    .getByRole("button", { name: "Save changes", exact: true })
+    .click();
+  await expect(
+    preview.getByRole("heading", { name: "My community server", exact: true }),
+  ).toBeVisible();
+  await expect(
+    preview.getByRole("button", { name: "Changes saved", exact: true }),
+  ).toBeVisible();
   await expectNoOverflow(page);
 });
 

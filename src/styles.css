@@ -706,8 +706,8 @@ h3 {
 }
 .hero-layout {
   display: grid;
-  grid-template-columns: 1.05fr 1fr;
-  gap: 64px;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: 48px;
   align-items: center;
 }
 .hero-copy,
@@ -1411,7 +1411,14 @@ a.person-card:hover {
 }
 @media (max-width: 1100px) {
   .hero-layout {
-    gap: 34px;
+    grid-template-columns: 1fr;
+    gap: 44px;
+  }
+  .hero-copy {
+    max-width: 650px;
+  }
+  .hero-preview {
+    max-width: 840px;
   }
   .hero-copy h1 {
     font-size: 49px;
@@ -1456,7 +1463,7 @@ a.person-card:hover {
   }
   .hero-preview {
     width: 100%;
-    max-width: 620px;
+    max-width: 840px;
   }
   .home-hero {
     padding-block: 65px;
