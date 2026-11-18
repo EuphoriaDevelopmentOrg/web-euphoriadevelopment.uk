@@ -10,11 +10,11 @@ const nextConfig: NextConfig = {
       "default-src 'self'",
       // Static Next.js hydration and the theme bootstrap need inline scripts.
       // Nonces would require rendering every page on each request.
-      `script-src 'self' 'unsafe-inline'${development ? " 'unsafe-eval'" : ""}`,
+      `script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com${development ? " 'unsafe-eval'" : ""}`,
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' https: data:",
       "font-src 'self'",
-      `connect-src 'self' https://api.euphoriadevelopment.uk https://api.github.com${development ? " ws: wss:" : ""}`,
+      `connect-src 'self' https://api.euphoriadevelopment.uk https://api.github.com https://cloudflareinsights.com${development ? " ws: wss:" : ""}`,
       "object-src 'none'",
       "base-uri 'self'",
       "form-action 'self'",
