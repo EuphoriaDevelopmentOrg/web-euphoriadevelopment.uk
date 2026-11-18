@@ -26,6 +26,12 @@ test("production headers prevent framing and third-party script loading", async 
     "frame-ancestors 'none'",
   );
   expect(headers["content-security-policy"]).not.toContain("'unsafe-eval'");
+  expect(headers["content-security-policy"]).toContain(
+    "https://static.cloudflareinsights.com",
+  );
+  expect(headers["content-security-policy"]).toContain(
+    "https://cloudflareinsights.com",
+  );
   expect(headers["strict-transport-security"]).toBe("max-age=31536000");
   expect(headers["x-powered-by"]).toBeUndefined();
 
