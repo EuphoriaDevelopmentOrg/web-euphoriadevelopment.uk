@@ -1,4 +1,5 @@
-import axios from "axios";
+import { fetchJson } from "./http";
+import { isRecord, safeUrl } from "./validation";
 
 export type TeamMember = {
   name: string;
@@ -7,33 +8,22 @@ export type TeamMember = {
   role: string;
 };
 
-function safeUrl(value: unknown): string | null {
-  if (typeof value !== "string") return null;
-  try {
-    const url = new URL(value);
-    return url.protocol === "https:" || url.protocol === "http:"
-      ? url.href
-      : null;
-  } catch {
-    return null;
-  }
-}
-
 export async function fetchTeam(): Promise<TeamMember[]> {
-  const { data } = await axios.get<unknown>(
-    "https://api.euphoriadevelopment.uk/team",
-  );
+  const data = await fetchJson("https://api.euphoriadevelopment.uk/team");
   if (!Array.isArray(data)) return [];
-  return data.map((item) => {
-    const person = item as Record<string, unknown>;
-    return {
-      name:
-        typeof person.Name === "string" && person.Name
-          ? person.Name
-          : "Unknown",
-      image: safeUrl(person.Image),
-      link: safeUrl(person.Link),
-      role: typeof person.Role === "string" ? person.Role : "",
-    };
-  });
+  return data
+    .filter(isRecord)
+    .slice(0, 500)
+    .map((item) => {
+      const person = item as Record<string, unknown>;
+      return {
+        name:
+          typeof person.Name === "string" && person.Name
+            ? person.Name
+            : "Unknown",
+        image: safeUrl(person.Image),
+        link: safeUrl(person.Link),
+        role: typeof person.Role === "string" ? person.Role : "",
+      };
+    });
 }

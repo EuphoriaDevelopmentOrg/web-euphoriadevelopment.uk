@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
+import Image from "next/image";
+import wordmark from "../../../public/brand/aquadactyl-wordmark.png";
 import {
   Archive,
   ArrowDownToLine,
@@ -359,10 +361,12 @@ export default function PanelPreview() {
         aria-label="Interactive Aquadactyl panel demo"
       >
         <div className="flex h-12 items-center justify-between gap-3 border-b border-[#252d34] bg-[#10151a] px-3.5 @[560px]/panel:px-5">
-          <img
-            src="/brand/aquadactyl-wordmark.png"
+          <Image
+            src={wordmark}
             alt="Aquadactyl"
-            className="w-28 shrink-0 @[700px]/panel:w-32"
+            width={128}
+            sizes="128px"
+            className="h-auto w-28 shrink-0 @[700px]/panel:w-32"
           />
           <div className="flex items-center gap-3 text-[9px] text-[#8997a4] @[700px]/panel:gap-4">
             <span className="hidden items-center gap-1.5 @[560px]/panel:flex">

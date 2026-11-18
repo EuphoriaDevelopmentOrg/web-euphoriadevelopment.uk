@@ -1,4 +1,5 @@
-import axios from "axios";
+import { fetchJson } from "./http";
+import { isRecord } from "./validation";
 
 type Offer = { url?: unknown; price?: unknown; currency?: unknown };
 export type RawProduct = {
@@ -18,22 +19,10 @@ export type SiteData = {
   blueprintExtensions?: RawProduct[];
 };
 
-let pending: Promise<SiteData> | undefined;
-
-// Share concurrent catalogue/statistics requests, without caching failures.
-export function fetchSiteData(): Promise<SiteData> {
-  pending ??= axios
-    .get<SiteData>("https://api.euphoriadevelopment.uk/stats/", {
-      timeout: 8000,
-    })
-    .then(({ data }) => {
-      if (!data || typeof data !== "object" || Array.isArray(data)) {
-        throw new Error("Invalid site data");
-      }
-      return data;
-    })
-    .finally(() => {
-      pending = undefined;
-    });
-  return pending;
+export async function fetchSiteData(refresh = false): Promise<SiteData> {
+  const data = await fetchJson("https://api.euphoriadevelopment.uk/stats/", {
+    refresh,
+  });
+  if (!isRecord(data)) throw new Error("Invalid site data");
+  return data as SiteData;
 }

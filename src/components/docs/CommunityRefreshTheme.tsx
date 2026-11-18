@@ -1,19 +1,9 @@
 "use client";
 
-import axios from "axios";
+import { fetchRepository, type Repository } from "@/utils/github";
 import { useEffect, useState } from "react";
 import Link from "fumadocs-core/link";
 import { CircleDot, ExternalLink, GitFork, Star } from "lucide-react";
-
-type Repository = {
-  name: string;
-  description: string | null;
-  html_url: string;
-  language: string | null;
-  stargazers_count: number;
-  forks_count: number;
-  open_issues_count: number;
-};
 
 export function CommunityRefreshTheme() {
   const [repository, setRepository] = useState<Repository | null | undefined>(
@@ -21,16 +11,17 @@ export function CommunityRefreshTheme() {
   );
 
   useEffect(() => {
-    void axios
-      .get<Repository>(
-        "https://api.github.com/repos/EuphoriaTheme/Refresh-Theme",
-        {
-          timeout: 5000,
-          headers: { Accept: "application/vnd.github+json" },
-        },
-      )
-      .then(({ data }) => setRepository(data))
-      .catch(() => setRepository(null));
+    let active = true;
+    void fetchRepository("EuphoriaTheme/Refresh-Theme")
+      .then((data) => {
+        if (active) setRepository(data);
+      })
+      .catch(() => {
+        if (active) setRepository(null);
+      });
+    return () => {
+      active = false;
+    };
   }, []);
 
   return (
@@ -82,15 +73,20 @@ export function CommunityRefreshTheme() {
               </span>
               <span className="bg-fd-secondary inline-flex items-center gap-1 rounded-md px-2 py-0.5">
                 <Star className="size-3 shrink-0" aria-hidden="true" />
-                {repository.stargazers_count.toLocaleString()} stars
+                {repository.stargazers_count?.toLocaleString() ??
+                  "Unavailable"}{" "}
+                stars
               </span>
               <span className="bg-fd-secondary inline-flex items-center gap-1 rounded-md px-2 py-0.5">
                 <GitFork className="size-3 shrink-0" aria-hidden="true" />
-                {repository.forks_count.toLocaleString()} forks
+                {repository.forks_count?.toLocaleString() ?? "Unavailable"}{" "}
+                forks
               </span>
               <span className="bg-fd-secondary inline-flex items-center gap-1 rounded-md px-2 py-0.5">
                 <CircleDot className="size-3 shrink-0" aria-hidden="true" />
-                {repository.open_issues_count.toLocaleString()} open issues
+                {repository.open_issues_count?.toLocaleString() ??
+                  "Unavailable"}{" "}
+                open issues
               </span>
             </div>
             <p className="text-fd-muted-foreground mt-3 text-sm">

@@ -108,7 +108,7 @@ export function Home() {
 
   useEffect(() => {
     let active = true;
-    void fetchSiteStats()
+    void fetchSiteStats(attempt > 0)
       .then((value) => {
         if (active) setStats(value);
       })
@@ -118,7 +118,7 @@ export function Home() {
       .finally(() => {
         if (active) setStatsLoading(false);
       });
-    void fetchBlueprintProducts()
+    void fetchBlueprintProducts(attempt > 0)
       .then(async (catalogue) => {
         if (!active) return;
         setProducts(catalogue);
@@ -169,6 +169,7 @@ export function Home() {
       <header className="home-header" ref={navigationRef}>
         <nav className="home-container home-nav" aria-label="Primary">
           <Link
+            prefetch={false}
             href="/"
             className="home-brand"
             aria-label="Euphoria Development home"
@@ -180,7 +181,7 @@ export function Home() {
           </Link>
           <div className="desktop-navigation">
             {navigation.map(([href, label]) => (
-              <Link key={href} href={href}>
+              <Link prefetch={false} key={href} href={href}>
                 {label}
               </Link>
             ))}
@@ -210,7 +211,12 @@ export function Home() {
           {menuOpen && (
             <div id="mobile-navigation" className="home-mobile-navigation">
               {navigation.map(([href, label]) => (
-                <Link key={href} href={href} onClick={() => setMenuOpen(false)}>
+                <Link
+                  prefetch={false}
+                  key={href}
+                  href={href}
+                  onClick={() => setMenuOpen(false)}
+                >
                   {label}
                   <ArrowRight size={16} aria-hidden="true" />
                 </Link>
@@ -243,7 +249,11 @@ export function Home() {
                   Explore our projects
                   <ArrowRight size={17} aria-hidden="true" />
                 </a>
-                <Link href="/docs" className="home-button secondary-button">
+                <Link
+                  prefetch={false}
+                  href="/docs"
+                  className="home-button secondary-button"
+                >
                   <BookOpen size={17} aria-hidden="true" />
                   Documentation
                 </Link>
@@ -312,7 +322,7 @@ export function Home() {
       </main>
       <footer className="home-footer">
         <div className="home-container footer-layout">
-          <Link href="/" className="home-brand">
+          <Link prefetch={false} href="/" className="home-brand">
             <Image src="/images/euphoria.png" alt="" width={30} height={30} />
             <span>
               Euphoria<span className="brand-subtitle">Development</span>
@@ -327,9 +337,13 @@ export function Home() {
         <div className="home-container footer-bottom">
           <p>© 2026 Euphoria Development. All rights reserved.</p>
           <nav aria-label="Footer">
-            <Link href="/legal/privacy-policy">Privacy Policy</Link>
-            <Link href="/legal/refund-policy">Refund Policy</Link>
-            <Link href="/legal/terms-and-conditions">
+            <Link prefetch={false} href="/legal/privacy-policy">
+              Privacy Policy
+            </Link>
+            <Link prefetch={false} href="/legal/refund-policy">
+              Refund Policy
+            </Link>
+            <Link prefetch={false} href="/legal/terms-and-conditions">
               Terms &amp; Conditions
             </Link>
           </nav>
@@ -436,7 +450,7 @@ function FeaturedProjects() {
                   <CodeXml size={14} aria-hidden="true" />
                   Source code
                 </Outbound>
-                <Link href={project.overview}>
+                <Link prefetch={false} href={project.overview}>
                   Project overview
                   <ArrowRight size={14} aria-hidden="true" />
                 </Link>
@@ -752,7 +766,7 @@ function WebApps({ apps }: { apps: WebApp[] }) {
         <p className="migration-note">
           Looking for Crafatar? It has moved to{" "}
           <Outbound href="https://nitrocraft.uk">NitroCraft</Outbound>.{" "}
-          <Link href="/docs/community/crafatar-api">
+          <Link prefetch={false} href="/docs/community/crafatar-api">
             Read the migration notes
             <ArrowRight size={13} aria-hidden="true" />
           </Link>

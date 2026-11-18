@@ -1,4 +1,5 @@
-import axios from "axios";
+import { fetchJson } from "./http";
+import { isRecord, safeUrl } from "./validation";
 
 export type Contributor = {
   name: string;
@@ -7,34 +8,25 @@ export type Contributor = {
   image: string | null;
 };
 
-function safeUrl(value: unknown): string | null {
-  if (typeof value !== "string") return null;
-  try {
-    const url = new URL(value);
-    return url.protocol === "https:" || url.protocol === "http:"
-      ? url.href
-      : null;
-  } catch {
-    return null;
-  }
-}
-
 export async function fetchContributors(): Promise<Contributor[]> {
-  const { data } = await axios.get<unknown>(
+  const data = await fetchJson(
     "https://api.euphoriadevelopment.uk/contributors",
   );
   if (!Array.isArray(data)) return [];
-  return data.map((item) => {
-    const person = item as Record<string, unknown>;
-    return {
-      name:
-        typeof person.Name === "string" && person.Name
-          ? person.Name
-          : "Unknown",
-      contribution:
-        typeof person.Contribution === "string" ? person.Contribution : "",
-      link: safeUrl(person.Link),
-      image: safeUrl(person.Image),
-    };
-  });
+  return data
+    .filter(isRecord)
+    .slice(0, 500)
+    .map((item) => {
+      const person = item as Record<string, unknown>;
+      return {
+        name:
+          typeof person.Name === "string" && person.Name
+            ? person.Name
+            : "Unknown",
+        contribution:
+          typeof person.Contribution === "string" ? person.Contribution : "",
+        link: safeUrl(person.Link),
+        image: safeUrl(person.Image),
+      };
+    });
 }

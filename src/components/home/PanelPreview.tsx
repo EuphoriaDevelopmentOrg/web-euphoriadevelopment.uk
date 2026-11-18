@@ -4,8 +4,8 @@ import AquadactylPanelDemo from "./AquadactylPanelDemo";
 import { aquadactylDemoUrl } from "@/utils/projects";
 import "./PanelPreview.css";
 
-// AquadactylPanelDemo.tsx is copied unchanged from Aquadactyl/website's
-// src/components/PanelPreview.tsx at fa15b9e. Keep it aligned with that preview.
+// Based on Aquadactyl/website's src/components/PanelPreview.tsx at fa15b9e,
+// with an optimized wordmark. Keep its appearance aligned with that preview.
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],

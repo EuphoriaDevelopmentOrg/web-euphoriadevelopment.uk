@@ -1,11 +1,4 @@
-import axios from "axios";
-
-type GithubRepository = {
-  stargazers_count: number;
-  forks_count: number;
-  language: string | null;
-  pushed_at: string;
-};
+import { fetchRepository } from "./github";
 export type WebApp = {
   name: string;
   description: string;
@@ -129,10 +122,7 @@ export async function fetchWebApps(): Promise<WebApp[]> {
     apps.map(async (app) => {
       if (!app.repository) return null;
       try {
-        const { data } = await axios.get<GithubRepository>(
-          `https://api.github.com/repos/${app.repository}`,
-          { timeout: 5000, headers: { Accept: "application/vnd.github+json" } },
-        );
+        const data = await fetchRepository(app.repository);
         return {
           stars: data.stargazers_count ?? 0,
           forks: data.forks_count ?? 0,

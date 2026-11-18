@@ -1,6 +1,6 @@
 "use client";
 
-import axios from "axios";
+import { fetchThemeRepositories } from "@/utils/github";
 import { useEffect, useState } from "react";
 import { ExternalLink, GitFork, Star } from "lucide-react";
 
@@ -41,29 +41,27 @@ export function BlueprintAddons() {
   const [repositories, setRepositories] = useState(initialRepositories);
   useEffect(() => {
     let active = true;
-    for (const initial of initialRepositories) {
-      void axios
-        .get<Repository>(
-          `https://api.github.com/repos/EuphoriaTheme/${initial.name}`,
-          {
-            timeout: 5000,
-            headers: { Accept: "application/vnd.github+json" },
-          },
-        )
-        .then(({ data }) => {
-          if (active)
-            setRepositories((previous) =>
-              previous.map((repository) =>
-                repository.name === initial.name
-                  ? { ...data, name: initial.name, html_url: initial.html_url }
-                  : repository,
-              ),
-            );
-        })
-        .catch(() => {
-          /* Repository and release links remain available. */
-        });
-    }
+    void fetchThemeRepositories()
+      .then((data) => {
+        if (active)
+          setRepositories(
+            initialRepositories.map((initial) => {
+              const metadata = data.find(
+                (repository) => repository.name === initial.name,
+              );
+              return metadata
+                ? {
+                    ...metadata,
+                    name: initial.name,
+                    html_url: initial.html_url,
+                  }
+                : initial;
+            }),
+          );
+      })
+      .catch(() => {
+        /* Repository and release links remain available. */
+      });
     return () => {
       active = false;
     };
