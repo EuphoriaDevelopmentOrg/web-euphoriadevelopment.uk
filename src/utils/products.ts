@@ -1,13 +1,12 @@
-import axios from "axios";
 import { fetchSiteData, type RawProduct } from "./site-data";
+import { fetchThemeRepositories } from "./github";
+import { isRecord, safeUrl, safeNumber, textOrNull } from "./validation";
 
-type GithubRepository = {
-  name: string;
-  html_url: string;
-  stargazers_count: number;
-  forks_count: number;
-  archived: boolean;
-  fork: boolean;
+const marketplaceHosts: Record<string, string> = {
+  GITHUB: "github.com",
+  BLUEPRINT: "blueprint.zip",
+  BUILTBYBIT: "builtbybit.com",
+  SOURCEXCHANGE: "sourcexchange.net",
 };
 
 export type BlueprintProduct = {
@@ -29,17 +28,6 @@ export type BlueprintProduct = {
   latestUpdated: string | null;
 };
 
-function safeUrl(value: unknown): string | null {
-  if (typeof value !== "string") return null;
-  try {
-    const url = new URL(value);
-    return url.protocol === "https:" || url.protocol === "http:"
-      ? url.href
-      : null;
-  } catch {
-    return null;
-  }
-}
 function bannerUrl(value: unknown): string | null {
   if (typeof value === "string") return safeUrl(value);
   if (!value || typeof value !== "object") return null;
@@ -54,8 +42,12 @@ function key(value: unknown): string {
 }
 function price(platforms: RawProduct["platforms"]): string {
   const offers = Object.values(platforms ?? {})
+    .filter(isRecord)
     .map((offer) => ({
-      price: Number(offer.price),
+      price:
+        typeof offer.price === "number" || typeof offer.price === "string"
+          ? Number(offer.price)
+          : NaN,
       currency: typeof offer.currency === "string" ? offer.currency : null,
     }))
     .filter((offer) => Number.isFinite(offer.price) && offer.price > 0);
@@ -83,23 +75,45 @@ function formatDate(value: unknown): string | null {
       }).format(date);
 }
 
-export async function fetchBlueprintProducts(): Promise<BlueprintProduct[]> {
-  const stats = await fetchSiteData();
+export async function fetchBlueprintProducts(
+  refresh = false,
+): Promise<BlueprintProduct[]> {
+  const stats = await fetchSiteData(refresh);
   if (!Array.isArray(stats.blueprintExtensions)) {
     throw new Error("Blueprint catalogue unavailable");
   }
   return stats.blueprintExtensions
+    .filter(isRecord)
+    .slice(0, 500)
     .map((product, index) => {
-      const platforms = product.platforms ?? {};
-      const explicitGithub = safeUrl(platforms.GITHUB?.url);
-      const latest = [...(product.versions ?? [])].sort(
+      const platforms = isRecord(product.platforms) ? product.platforms : {};
+      const offerUrl = (platform: string) => {
+        const url = isRecord(platforms[platform])
+          ? safeUrl(platforms[platform].url)
+          : null;
+        return url &&
+          new URL(url).hostname.replace(/^www\./, "") ===
+            marketplaceHosts[platform]
+          ? url
+          : null;
+      };
+      const explicitGithub = offerUrl("GITHUB");
+      const latest = (
+        Array.isArray(product.versions)
+          ? product.versions.filter(isRecord).slice(0, 100)
+          : []
+      ).sort(
         (a, b) =>
-          Date.parse(String(b.created ?? "")) -
-          Date.parse(String(a.created ?? "")),
+          Date.parse(textOrNull(b.created) ?? "") -
+          Date.parse(textOrNull(a.created) ?? ""),
       )[0];
       return {
-        id: String(product.id ?? product.identifier ?? index),
-        identifier: String(product.identifier ?? product.name ?? ""),
+        id:
+          textOrNull(product.id) ??
+          textOrNull(product.identifier) ??
+          String(index),
+        identifier:
+          textOrNull(product.identifier) ?? textOrNull(product.name) ?? "",
         name:
           typeof product.name === "string" && product.name
             ? product.name
@@ -108,18 +122,20 @@ export async function fetchBlueprintProducts(): Promise<BlueprintProduct[]> {
           typeof product.summary === "string"
             ? product.summary
             : "No summary provided.",
-        type: (String(product.type).toLowerCase() === "theme"
+        type: (textOrNull(product.type)?.toLowerCase() === "theme"
           ? "theme"
           : "addon") as "addon" | "theme",
         banner: bannerUrl(product.banner),
-        blueprintUrl: safeUrl(platforms.BLUEPRINT?.url),
-        builtByBitUrl: safeUrl(platforms.BUILTBYBIT?.url),
-        sourceXchangeUrl: safeUrl(platforms.SOURCEXCHANGE?.url),
+        blueprintUrl: offerUrl("BLUEPRINT"),
+        builtByBitUrl: offerUrl("BUILTBYBIT"),
+        sourceXchangeUrl: offerUrl("SOURCEXCHANGE"),
         githubUrl: explicitGithub,
         githubStars: null,
         githubForks: null,
-        panels: Math.max(0, Number(product.stats?.panels) || 0),
-        priceLabel: price(platforms),
+        panels:
+          safeNumber(isRecord(product.stats) ? product.stats.panels : null) ??
+          0,
+        priceLabel: price(platforms as RawProduct["platforms"]),
         latestVersion:
           typeof latest?.name === "string" ? `v${latest.name}` : null,
         latestUpdated: formatDate(latest?.created),
@@ -134,10 +150,7 @@ export async function enrichBlueprintProducts(
   products: BlueprintProduct[],
 ): Promise<BlueprintProduct[]> {
   try {
-    const { data: repositories } = await axios.get<GithubRepository[]>(
-      "https://api.github.com/orgs/EuphoriaTheme/repos?per_page=100&sort=updated",
-      { timeout: 5000, headers: { Accept: "application/vnd.github+json" } },
-    );
+    const repositories = await fetchThemeRepositories();
     const repoIndex = new Map(
       repositories
         .filter((repo) => !repo.archived && !repo.fork)

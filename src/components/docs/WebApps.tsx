@@ -1,6 +1,6 @@
 "use client";
 
-import axios from "axios";
+import { fetchRepository } from "@/utils/github";
 import { useEffect, useState } from "react";
 import Link from "fumadocs-core/link";
 import { ArrowRight, ExternalLink, GitFork, Star } from "lucide-react";
@@ -21,16 +21,8 @@ export function WebApps() {
   useEffect(() => {
     let active = true;
     for (const [key, repository] of Object.entries(repositories)) {
-      void axios
-        .get<{
-          forks_count?: number;
-          stargazers_count?: number;
-          language?: string | null;
-        }>(`https://api.github.com/repos/${repository}`, {
-          timeout: 5000,
-          headers: { Accept: "application/vnd.github+json" },
-        })
-        .then(({ data: repo }) => {
+      void fetchRepository(repository)
+        .then((repo) => {
           if (active)
             setMetadata((previous) => ({
               ...previous,

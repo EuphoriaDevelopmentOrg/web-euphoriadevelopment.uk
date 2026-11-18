@@ -72,8 +72,8 @@ body.legal-page {
     ),
     linear-gradient(180deg, #020617 0%, #030816 38%, #05070f 100%);
   font-family:
-    "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
-    sans-serif;
+    var(--font-ibm-plex-sans), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", sans-serif;
   line-height: 1.55;
 }
 
@@ -221,8 +221,8 @@ a {
   margin: 0.32rem 0 0;
   color: var(--lp-title);
   font-family:
-    "Space Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
-    sans-serif;
+    var(--font-space-grotesk), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", sans-serif;
   letter-spacing: -0.02em;
   font-size: clamp(1.95rem, 4.8vw, 3.1rem);
   line-height: 1.07;
@@ -272,8 +272,8 @@ a {
   margin: 0;
   color: var(--lp-title);
   font-family:
-    "Space Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
-    sans-serif;
+    var(--font-space-grotesk), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", sans-serif;
   letter-spacing: -0.015em;
   font-size: 1.04rem;
 }
@@ -344,8 +344,8 @@ a {
   margin: 0;
   color: var(--lp-title);
   font-family:
-    "Space Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
-    sans-serif;
+    var(--font-space-grotesk), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", sans-serif;
   letter-spacing: -0.02em;
   font-size: clamp(1.06rem, 2.25vw, 1.44rem);
   line-height: 1.2;
@@ -397,8 +397,8 @@ a {
   margin: 0;
   color: var(--lp-title);
   font-family:
-    "Space Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
-    sans-serif;
+    var(--font-space-grotesk), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", sans-serif;
   letter-spacing: -0.015em;
   font-size: 1.14rem;
 }
@@ -551,12 +551,12 @@ html {
   scroll-behavior: smooth;
 }
 body {
-  font-family: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-ibm-plex-sans), ui-sans-serif, system-ui, sans-serif;
 }
 h1,
 h2,
 h3 {
-  font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
   letter-spacing: -0.02em;
 }
 /* The marketing surface is scoped so documentation and policy themes retain
@@ -629,7 +629,7 @@ h3 {
   gap: 11px;
   flex-shrink: 0;
   color: var(--home-text);
-  font-family: "Space Grotesk", sans-serif;
+  font-family: var(--font-space-grotesk), sans-serif;
   font-size: 21px;
   font-weight: 600;
   letter-spacing: -0.03em;
@@ -641,7 +641,7 @@ h3 {
 .brand-subtitle {
   display: block;
   margin-top: 4px;
-  font-family: "IBM Plex Sans", sans-serif;
+  font-family: var(--font-ibm-plex-sans), sans-serif;
   color: var(--home-muted);
   font-size: 10px;
   font-weight: 500;
@@ -961,7 +961,7 @@ h3 {
 }
 .home-stat strong {
   display: block;
-  font-family: "Space Grotesk", sans-serif;
+  font-family: var(--font-space-grotesk), sans-serif;
   font-size: 29px;
   font-weight: 500;
   line-height: 1.2;
@@ -1045,7 +1045,7 @@ h3 {
 }
 .product-artwork-fallback span {
   max-width: 20ch;
-  font-family: "Space Grotesk", sans-serif;
+  font-family: var(--font-space-grotesk), sans-serif;
   font-size: 18px;
   letter-spacing: -0.025em;
 }

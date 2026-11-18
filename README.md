@@ -32,11 +32,22 @@ The tests cover direct docs and legal routes, shared navigation and theme cleanu
 - `src/utils/web-apps.ts` contains the app listings, demos, and marketplace links. Listings render immediately; optional GitHub metadata loads separately.
 - `src/utils/projects.ts` contains the Aquadactyl and Manta listings, logos and official links. These render before optional API data arrives, including during catalogue outages.
 - `src/utils/site-data.ts` shares concurrent requests to the stats API. Blueprints render as soon as the catalogue arrives. GitHub failures do not hide products.
+- Public metadata requests have a 5–8 second timeout, a 2 MiB response limit and a 60-second browser memory cache. Concurrent requests share a response; failed requests are not cached, and the catalogue's Retry action requests fresh data. The addon documentation uses one GitHub organization request instead of one request per addon.
 - Project totals count Aquadactyl and Manta, returned Blueprints, and current web app editions. Free and paid Paste count separately; the Crafatar migration notice does not count again. Unavailable statistics are labelled as unavailable; actual zero values stay zero.
 - `src/site-pages.ts` defines page titles, descriptions, docs groups, and canonical paths. When adding a route, add it there as well as in `src/app/`.
 - `src/app/docs/layout.tsx` owns the docs header, sidebar and footer. Article components contain only their page content.
 - `src/app/sitemap.ts` generates `sitemap.xml` dynamically using Next.js Metadata Route.
 - Next.js pre-renders all pages at build time with route-specific HTML metadata (titles, canonical links, open graph, and twitter tags).
+
+## Security and performance
+
+API responses are treated as untrusted data: links require HTTPS without embedded credentials, repository links use canonical GitHub identifiers, and malformed fields are discarded before rendering. Text remains React-escaped. Environment files are ignored by Git; use `.env.example` for placeholders.
+
+The app sends CSP, frame protection, MIME-sniffing protection, referrer and permissions policies, and a one-year HSTS policy. A reverse proxy must preserve these headers. The CSP permits the inline bootstrap scripts required by static Next.js pages; it restricts external scripts and production `eval`, but is not a nonce-based policy that blocks every inline-script injection. Keep untrusted HTML out of rendered content.
+
+The dependency audit currently reports [GHSA-fc5q-39xc-vjpf](https://github.com/advisories/GHSA-fc5q-39xc-vjpf) in picomatch, with no published patched version. Its use here is the trusted documentation/build glob pipeline, rather than visitor-provided patterns. The advisory is not suppressed; replace the dependency when an upstream fix becomes available.
+
+Fonts are self-hosted, the panel wordmark uses Next.js image optimization, and homepage links load documentation code when followed. CI retains `.next/cache`, keyed by the dependency lockfile and commit, for incremental builds. Production pages remain statically generated.
 
 ## Dokploy with the GitHub integration
 

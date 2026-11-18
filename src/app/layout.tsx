@@ -1,7 +1,21 @@
 import type { Metadata, Viewport } from "next";
+import { IBM_Plex_Sans, Space_Grotesk } from "next/font/google";
 import { BodyTheme } from "@/components/BodyTheme";
 import { siteOrigin, sitePages } from "@/site-pages";
 import "@/styles.css";
+
+const ibmPlex = IBM_Plex_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  variable: "--font-ibm-plex-sans",
+  display: "swap",
+});
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  weight: ["600", "700"],
+  variable: "--font-space-grotesk",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteOrigin),
@@ -71,18 +85,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${ibmPlex.variable} ${spaceGrotesk.variable}`}>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin=""
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap"
-          rel="stylesheet"
-        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
