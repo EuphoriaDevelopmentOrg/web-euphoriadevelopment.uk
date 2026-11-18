@@ -240,6 +240,11 @@ test("Aquadactyl and Manta remain discoverable when external services fail", asy
     await expect(
       card.getByRole("link", { name: "Project overview" }),
     ).toHaveAttribute("href", project.docs);
+    if (project.name === "Aquadactyl") {
+      await expect(
+        card.getByRole("link", { name: "Live demo", exact: true }),
+      ).toHaveAttribute("href", "https://demo.aquadactyl.uk");
+    }
     expect((await request.get(project.logo)).ok()).toBe(true);
   }
   await expect(

@@ -413,10 +413,25 @@
   color: #93ddba;
 }
 .panel-demo-caption {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px 14px;
   margin-top: 12px;
   text-align: right;
   color: #91a2b6;
   font-size: 10px;
+}
+.panel-demo-caption a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #a1dffc;
+}
+.panel-demo-caption a:hover {
+  color: #fff;
+  text-decoration: underline;
 }
 .panel-demo-announcement {
   position: absolute;

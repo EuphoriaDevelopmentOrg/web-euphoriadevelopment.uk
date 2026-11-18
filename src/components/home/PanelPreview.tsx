@@ -11,6 +11,7 @@ import {
 import Image from "next/image";
 import {
   ArrowRight,
+  ArrowUpRight,
   ChevronRight,
   Cpu,
   Folder,
@@ -24,6 +25,7 @@ import {
   Users,
 } from "lucide-react";
 import "./PanelPreview.css";
+import { aquadactylDemoUrl } from "@/utils/projects";
 
 type Screen = "console" | "servers";
 type LogLine = { text: string; kind?: "success" | "command" | "muted" };
@@ -330,7 +332,12 @@ export default function PanelPreview() {
           </span>
         </div>
       </div>
-      <p className="panel-demo-caption">Illustrative interface · sample data</p>
+      <div className="panel-demo-caption">
+        <a href={aquadactylDemoUrl} target="_blank" rel="noopener noreferrer">
+          Open live demo <ArrowUpRight size={12} aria-hidden="true" />
+        </a>
+        <span>Illustrative interface · sample data</span>
+      </div>
       <span className="panel-demo-announcement" role="status">
         {announcement}
       </span>

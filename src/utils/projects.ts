@@ -1,4 +1,6 @@
 // Flagship projects remain available when the catalogue or GitHub API is offline.
+export const aquadactylDemoUrl = "https://demo.aquadactyl.uk";
+
 export const projects = [
   {
     id: "aquadactyl",
@@ -14,6 +16,7 @@ export const projects = [
       "Personal server folders",
     ],
     href: "https://aquadactyl.uk/",
+    demo: aquadactylDemoUrl,
     docs: "https://aquadactyl.uk/docs/panel/installing-the-panel",
     repository: "https://github.com/Aquadactyl/aquadactyl",
     overview: "/docs/community/aquadactyl",
