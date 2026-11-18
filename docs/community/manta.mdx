@@ -21,14 +21,15 @@ compatibility with your panel version and test your workload before replacing a
 running daemon. Manta is currently in beta.
 
 Manta is derived from [Pterodactyl Wings](https://github.com/pterodactyl/wings),
-with upstream credits preserved under its MIT license. Legacy command, service
-and data-directory names remain for existing node compatibility. See the
+with upstream credits preserved under its MIT license. New installs use the `manta` executable, `manta.service`, the `aquadactyl`
+system user and `/var/lib/aquadactyl` data directories. Existing configurations
+retain their paths and user IDs until explicitly migrated. See the
 [configuration migration guide](https://aquadactyl.uk/docs/manta/installing-manta#migrate-config)
 before changing an existing service or Docker mount.
 
 ## Get started
 
-The current release is [Manta v1.1-beta.1](https://github.com/Aquadactyl/manta/releases/tag/v1.1-beta.1),
+The current release is [Manta v1.1-beta.2](https://github.com/Aquadactyl/manta/releases/tag/v1.1-beta.2),
 with downloads for Linux and macOS on AMD64 and ARM64. It includes the Manta /
 Aquadactyl branding updates and keeps diagnostics local unless an operator
 explicitly chooses an upload service.
