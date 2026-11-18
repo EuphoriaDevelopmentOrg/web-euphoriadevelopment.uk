@@ -9,7 +9,7 @@
     "format:check": "oxfmt --check .",
     "lint": "oxlint .",
     "lint:fix": "oxlint . --fix",
-    "types": "tsc --noEmit",
+    "types": "next typegen && tsc --noEmit",
     "test": "playwright test",
     "postinstall": "fumadocs-mdx",
     "check": "pnpm lint && pnpm types && pnpm build && pnpm test"
