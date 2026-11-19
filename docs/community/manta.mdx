@@ -29,10 +29,12 @@ before changing an existing service or Docker mount.
 
 ## Get started
 
-The current release is [Manta v1.1-beta.2](https://github.com/Aquadactyl/manta/releases/tag/v1.1-beta.2),
+The current release is [Manta v1.1-beta.3](https://github.com/Aquadactyl/manta/releases/tag/v1.1-beta.3),
 with downloads for Linux and macOS on AMD64 and ARM64. It includes the Manta /
 Aquadactyl branding updates and keeps diagnostics local unless an operator
-explicitly chooses an upload service.
+explicitly chooses an upload service. This patch also fixes the initial server-list
+request to use page 1, preventing startup HTTP 422 errors against panels that
+validate pagination.
 
 - [Manta documentation](https://aquadactyl.uk/docs/manta)
 - [Installation guide](https://aquadactyl.uk/docs/manta/installing-manta)
